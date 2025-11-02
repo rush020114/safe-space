@@ -1,5 +1,6 @@
 package com.safespace.content_filter_backend.auth.config;
 
+import com.safespace.content_filter_backend.auth.filter.LoginFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,6 +13,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -49,6 +51,10 @@ public class SecurityConfig {
                         .requestMatchers("/test3").hasAnyRole("MANAGER, ADMIN") // MAMAGER, ADMIN 접근 가능
                         .anyRequest().permitAll() // 위 요청을 제외한 나머지 요청 접근 가능
             );
+
+    // 로그인 프로세스를 진행하는 loginFilter 클래스를 SecurityFilterChain에 추가
+    // UsernamePasswordAuthenticationFilter 클래스 위치에 LoginFilter를 사용하겠다는 뜻
+    httpSecurity.addFilterAt(new LoginFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class);
 
     return httpSecurity.build();
   }
