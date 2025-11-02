@@ -9,6 +9,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -42,7 +44,7 @@ public class SecurityConfig {
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             // 인증 및 인가에 대한 접근 설정
             .authorizeHttpRequests(auth ->
-                    auth.requestMatchers("/test1").authenticated() // 인증된 유저만 접근 가능
+                    auth.requestMatchers("/test1").authenticated() // 인증 정보를 가지고 있는 사람만 접근 가능
                         .requestMatchers("/test2").hasRole("ADMIN") // ADMIN 권한만 접근 가능
                         .requestMatchers("/test3").hasAnyRole("MANAGER, ADMIN") // MAMAGER, ADMIN 접근 가능
                         .anyRequest().permitAll() // 위 요청을 제외한 나머지 요청 접근 가능
@@ -65,5 +67,10 @@ public class SecurityConfig {
     UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
     urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
     return urlBasedCorsConfigurationSource;
+  }
+
+  @Bean
+  public PasswordEncoder bCryptPasswordEncoder() {
+    return new BCryptPasswordEncoder();
   }
 }
