@@ -1,5 +1,7 @@
-package com.safespace.content_filter_backend.auth.filter;
+package com.safespace.content_filter_backend.auth.config;
 
+import com.safespace.content_filter_backend.auth.filter.Filter1;
+import com.safespace.content_filter_backend.auth.filter.Filter2;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
