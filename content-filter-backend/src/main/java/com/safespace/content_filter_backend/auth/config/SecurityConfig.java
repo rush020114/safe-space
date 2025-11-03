@@ -1,6 +1,8 @@
 package com.safespace.content_filter_backend.auth.config;
 
 import com.safespace.content_filter_backend.auth.filter.LoginFilter;
+import com.safespace.content_filter_backend.auth.util.JwtUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,8 +25,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 // 설정 파일을 만들어 각 api마다 접근할 수 있는 인증/인가에 대한 설정이 필요하다.
 @Configuration
 @EnableWebSecurity // security 기본 설정 활성화(보안 설정 컨트롤 가능)
+@RequiredArgsConstructor
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class SecurityConfig {
+  private final JwtUtil jwtUtil;
   // spring security에서 http 요청에 대한 보안 설정을 정의하는 메서드
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity httpSecurity, AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -54,7 +58,7 @@ public class SecurityConfig {
 
     // 로그인 프로세스를 진행하는 loginFilter 클래스를 SecurityFilterChain에 추가
     // UsernamePasswordAuthenticationFilter 클래스 위치에 LoginFilter를 사용하겠다는 뜻
-    httpSecurity.addFilterAt(new LoginFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class);
+    httpSecurity.addFilterAt(new LoginFilter(authenticationManager, jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
     return httpSecurity.build();
   }
