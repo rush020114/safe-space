@@ -11,6 +11,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
+// component : 직접 만든 클래스를 bean에 등록할 때 사용
 @Component
 public class JwtUtil {
   private SecretKey secretKey;
