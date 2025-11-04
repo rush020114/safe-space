@@ -96,7 +96,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     String accessToken = jwtUtil.createJwt(username, role, (1000 * 60 * 10));
 
     // 생성한 토큰을 응답 헤더에 담아 클라이언트에 전달
-    // Authorization 헤더는 클라이언트가 접근하면 안 되므로 기본적으로 정보를 숨키는데 이를 명시적으로 보여주기 위한 설정 코드이다.
+    // Authorization 헤더는 클라이언트가 접근하면 안 되므로 기본적으로 정보를 숨기는데 이를 명시적으로 보여주기 위한 설정 코드이다.
     response.setHeader("Access-Control-Expose-Headers", "Authorization");
     // jwt 토큰을 추가할 때 일반적으로 "Bearer " 키워드가 붙음.
     response.setHeader("Authorization", "Bearer " + accessToken);

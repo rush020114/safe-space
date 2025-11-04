@@ -13,7 +13,7 @@ import java.util.Collection;
 public class CustomUserDetails implements UserDetails {
   private final MemberDTO memberDTO;
 
-  @Override
+  @Override // 계정의 권한 정보를 리턴
   public Collection<? extends GrantedAuthority> getAuthorities() {
     Collection<GrantedAuthority> collection = new ArrayList<>();
 
