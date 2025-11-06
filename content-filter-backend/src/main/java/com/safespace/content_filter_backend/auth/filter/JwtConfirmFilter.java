@@ -1,8 +1,8 @@
 package com.safespace.content_filter_backend.auth.filter;
 
-import com.safespace.content_filter_backend.auth.domain.CustomUserDetails;
+import com.safespace.content_filter_backend.auth.dto.CustomUserDetails;
 import com.safespace.content_filter_backend.auth.util.JwtUtil;
-import com.safespace.content_filter_backend.user.dto.MemberDTO;
+import com.safespace.content_filter_backend.member.dto.MemberDTO;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,7 +27,7 @@ public class JwtConfirmFilter extends OncePerRequestFilter {
   protected void doFilterInternal (HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
     log.info("JwtConfirmFilter - doFilerInternal() 메서드 실행");
 
-    // 요청 시 전달되는 Authroization 헤더를 찾음.(헤더에 토큰이 있으므로)
+    // 요청 시 전달되는 Authorization 헤더를 찾음.(헤더에 토큰이 있으므로)
     String authorization = request.getHeader("Authorization");
 
     // Authorization 헤더가 없거나 토큰이 Bearer로 시작하지 않으면

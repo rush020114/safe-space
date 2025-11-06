@@ -1,8 +1,8 @@
-package com.safespace.content_filter_backend.user.service.impl;
+package com.safespace.content_filter_backend.member.service.impl;
 
-import com.safespace.content_filter_backend.user.dto.MemberDTO;
-import com.safespace.content_filter_backend.user.mapper.MemberMapper;
-import com.safespace.content_filter_backend.user.service.MemberService;
+import com.safespace.content_filter_backend.member.dto.MemberDTO;
+import com.safespace.content_filter_backend.member.mapper.MemberMapper;
+import com.safespace.content_filter_backend.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

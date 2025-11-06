@@ -1,4 +1,4 @@
-package com.safespace.content_filter_backend.user.controller;
+package com.safespace.content_filter_backend.member.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;

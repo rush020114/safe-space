@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import jwtDecode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 // Redux는 데이터를 props로 전달하지 않아도 모든 컴포넌트에서 사용할 수 있다.
 // Store : 공유해서 사용할 state 변수들의 저장소
@@ -11,6 +11,26 @@ import jwtDecode from "jwt-decode";
 // createSlice: slice를 생성하는 명령어
 // name은 상태를 저장할 변수 이름의 키값
 // intitialState는 초기값
+
+const getToken = () => {
+  const token = localStorage.getItem('accessToken');
+
+  if(token == null) return null;
+
+  // 복호화된 토큰
+  const decodeToken = jwtDecode(token);
+
+  // 현재 날짜 및 시간
+  const currentTime = Date.now() / 1000;
+
+  // 토큰의 만료기간이 지났으면
+  if(decodeToken.exp < currentTime){
+    localStorage.removeItem('accessToken');
+    return null;
+  } else {
+    return token;
+  }
+}
 
 const authSlice = createSlice({
   name: 'auth',
@@ -33,23 +53,3 @@ const authSlice = createSlice({
 // state 변경 함수 import 문법
 export const {loginReducer, logoutReducer} = authSlice.actions;
 export default authSlice;
-
-const getToken = () => {
-  const token = localStorage.getItem('accessToken');
-
-  if(token == null) return null;
-
-  // 복호화된 토큰
-  const decodeToken = jwtDecode(token);
-
-  // 현재 날짜 및 시간
-  const currentTime = Date.now() / 1000;
-
-  // 토큰의 만료기간이 지났으면
-  if(decodeToken.exp < currentTime){
-    localStorage.removeItem('accessToken');
-    return null;
-  } else {
-    return token;
-  }
-}

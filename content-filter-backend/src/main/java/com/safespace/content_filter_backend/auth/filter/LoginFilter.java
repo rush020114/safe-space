@@ -2,7 +2,7 @@ package com.safespace.content_filter_backend.auth.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.safespace.content_filter_backend.auth.util.JwtUtil;
-import com.safespace.content_filter_backend.user.dto.MemberDTO;
+import com.safespace.content_filter_backend.member.dto.MemberDTO;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletInputStream;
@@ -81,7 +81,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
   @Override
   protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
-    log.info("로그인 검증 성공");
+    log.info("로그인 검증 성공 - successfulAuthentication 메서드 실행");
 
     // 토큰 생성을 위한 아이디 정보 추출
     String username = authResult.getName();
@@ -106,7 +106,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
   // 아이디는 맞지만 비밀번호가 틀렸을 때 실행
   @Override
   protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
-    log.info("로그인 검증 실패");
+    log.info("로그인 검증 실패 - unsuccessfulAuthentication 메서드 실행");
     response.setStatus(401);
   }
 

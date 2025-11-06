@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React from 'react'
+import React, { useState } from 'react'
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { loginReducer } from '../../redux/authSlice';
@@ -11,9 +11,14 @@ const Login = () => {
   const dispatch = useDispatch();
   const nav = useNavigate();
 
+  const [loginInfo, setLoginInfo] = useState({
+    memEmail: ''
+    , memPw: ''
+  });
+
   // 로그인 요청 함수
   const login = () => {
-    axios.post('/api/member/login', loginInfo)
+    axios.post('http://localhost:8080/member/login', loginInfo)
     .then(res => {
       alert('로그인 성공');
       
@@ -34,9 +39,36 @@ const Login = () => {
       }
     });
   };
+
+  // 회원 정보 데이터 입력 함수
+  const handleUserInfo = e => {
+    setLoginInfo({
+      ...loginInfo
+      , [e.target.name]: e.target.value
+    });
+  };
+
+  console.log(loginInfo)
   
   return (
-    <div>Login</div>
+    <div>
+      <input 
+        type="text" 
+        name='memEmail'
+        value={loginInfo.memEmail}
+        onChange={e => handleUserInfo(e)}
+      />
+      <input 
+        type="password" 
+        name='memPw'
+        value={loginInfo.memPw}
+        onChange={e => handleUserInfo(e)}
+      />
+      <button 
+        type='button'
+        onClick={() => login()}
+      >로그인</button>
+    </div>
   )
 }
 

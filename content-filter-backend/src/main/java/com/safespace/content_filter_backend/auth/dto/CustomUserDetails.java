@@ -1,6 +1,6 @@
-package com.safespace.content_filter_backend.auth.domain;
+package com.safespace.content_filter_backend.auth.dto;
 
-import com.safespace.content_filter_backend.user.dto.MemberDTO;
+import com.safespace.content_filter_backend.member.dto.MemberDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 // 로그인으로 조회한 정보를 포장하기 위한 클래스
+// Spring Security는 인증을 처리할 때 내부적으로 UserDetails 타입의 객체를 요구
 @RequiredArgsConstructor
 public class CustomUserDetails implements UserDetails {
   private final MemberDTO memberDTO;

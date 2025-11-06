@@ -1,6 +1,6 @@
-package com.safespace.content_filter_backend.user.mapper;
+package com.safespace.content_filter_backend.member.mapper;
 
-import com.safespace.content_filter_backend.user.dto.MemberDTO;
+import com.safespace.content_filter_backend.member.dto.MemberDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
