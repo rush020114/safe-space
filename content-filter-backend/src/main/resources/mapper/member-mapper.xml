@@ -5,10 +5,12 @@
 <!-- namespace에는 xml파일과 연결할 Mapper interface 파일명을 패키지를 포함하여 적어주세요 -->
 <mapper namespace="com.safespace.content_filter_backend.member.mapper.MemberMapper">
 	<resultMap id="member" type="com.safespace.content_filter_backend.member.dto.MemberDTO">
+        <result column="MEM_ID"  property="memId" />
         <result column="MEM_EMAIL"  property="memEmail" />
         <result column="MEM_PW"     property="memPw" />
         <result column="MEM_NAME"   property="memName" />
         <result column="MEM_ROLE"   property="memRole" />
+        <result column="CREATED_AT"   property="memRole" />
     </resultMap>
 
     <!-- 로그인하려는 회원 정보 조회 -->
@@ -17,7 +19,20 @@
             , MEM_PW
             , MEM_ROLE
             , MEM_NAME
-        FROM SECURITY_MEMBER
+        FROM MEMBER
         WHERE MEM_EMAIL = #{memEmail}
     </select>
+
+    <!-- 회원가입 -->
+    <insert id="regMember">
+        INSERT INTO MEMBER (
+            MEM_EMAIL
+            , MEM_PW
+            , MEM_NAME
+        ) VALUES (
+            #{memEmail}
+            , #{memPw}
+            , #{memName}
+        )
+    </insert>
 </mapper>

@@ -2,8 +2,9 @@ import axios from 'axios';
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { loginReducer } from '../redux/authSlice';
-import { SERVER_URL } from '../constants/appConst';
+import { loginReducer } from '../../redux/authSlice';
+import { SERVER_URL } from '../../constants/appConst';
+import { Container, Form, Button } from 'react-bootstrap';
 
 const Login = () => {
 
@@ -12,6 +13,7 @@ const Login = () => {
   const dispatch = useDispatch();
   const nav = useNavigate();
 
+  // 로그인 정보를 저장할 state 변수
   const [loginInfo, setLoginInfo] = useState({
     memEmail: ''
     , memPw: ''
@@ -52,24 +54,40 @@ const Login = () => {
   console.log(loginInfo)
   
   return (
-    <div>
-      <input 
-        type="text" 
-        name='memEmail'
-        value={loginInfo.memEmail}
-        onChange={e => handleUserInfo(e)}
-      />
-      <input 
-        type="password" 
-        name='memPw'
-        value={loginInfo.memPw}
-        onChange={e => handleUserInfo(e)}
-      />
-      <button 
-        type='button'
-        onClick={() => login()}
-      >로그인</button>
-    </div>
+    <Container className="mt-5" style={{maxWidth: '500px'}}>
+      <h2 className="text-center mb-4">로그인</h2>
+      <Form>
+        <Form.Group className="mb-3">
+          <Form.Label>이메일</Form.Label>
+          <Form.Control
+            type="text"
+            name="memEmail"
+            value={loginInfo.memEmail}
+            onChange={e => handleUserInfo(e)}
+            placeholder="이메일 입력"
+          />
+        </Form.Group>
+
+        <Form.Group className="mb-3">
+          <Form.Label>비밀번호</Form.Label>
+          <Form.Control
+            type="password"
+            name="memPw"
+            value={loginInfo.memPw}
+            onChange={e => handleUserInfo(e)}
+            placeholder="비밀번호 입력"
+          />
+        </Form.Group>
+
+        <Button
+          type="button"
+          onClick={() => login()}
+          className="w-100"
+        >
+          로그인
+        </Button>
+      </Form>
+    </Container>
   )
 }
 

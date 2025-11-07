@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { isAdmin } from '../apis/authCheck';
+import { isAdmin } from '../../apis/authCheck';
 import { Navigate } from 'react-router-dom';
 
 const ProtectedAdminRoute = ({children}) => {
