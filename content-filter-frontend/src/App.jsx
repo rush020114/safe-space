@@ -5,8 +5,8 @@ import './App.css'
 import Menu from './Menu'
 import Login from './auth/Login'
 import { Route, Routes } from 'react-router-dom'
-import ProtectedRoute from './ProtectedRoute'
-import ProtectedAdminRoute from './ProtectedAdminRoute'
+import ProtectedRoute from './components/ProtectedRoute'
+import ProtectedAdminRoute from './components/ProtectedAdminRoute'
 import Header from './Header'
 
 const App = () => {

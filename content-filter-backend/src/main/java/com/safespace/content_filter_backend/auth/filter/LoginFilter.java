@@ -86,6 +86,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     // 토큰 생성을 위한 아이디 정보 추출
     String username = authResult.getName();
 
+    System.out.println("username : " + username);
+
     // 토큰 생성을 위한 권한 정보 추출
     Collection<? extends GrantedAuthority> authorities = authResult.getAuthorities();
     Iterator<? extends GrantedAuthority> iterator = authorities.iterator();

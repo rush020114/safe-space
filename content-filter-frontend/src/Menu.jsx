@@ -1,7 +1,7 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom';
-import { isAdmin, isAuthenticated } from '../apis/authCheck';
+import { isAdmin, isAuthenticated } from './apis/authCheck';
 
 const Menu = () => {
 

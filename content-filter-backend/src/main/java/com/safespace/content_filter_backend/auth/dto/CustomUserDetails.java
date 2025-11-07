@@ -35,7 +35,7 @@ public class CustomUserDetails implements UserDetails {
 
   @Override // 계정의 아이디를 리턴
   public String getUsername() {
-    return memberDTO.getMemName();
+    return memberDTO.getMemEmail();
   }
 
   @Override // 만료되지 않은 계정인가?

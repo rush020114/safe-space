@@ -2,7 +2,8 @@ import axios from 'axios';
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { loginReducer } from '../../redux/authSlice';
+import { loginReducer } from '../redux/authSlice';
+import { SERVER_URL } from '../constants/appConst';
 
 const Login = () => {
 
@@ -18,7 +19,7 @@ const Login = () => {
 
   // 로그인 요청 함수
   const login = () => {
-    axios.post('http://localhost:8080/member/login', loginInfo)
+    axios.post(`${SERVER_URL}/member/login`, loginInfo)
     .then(res => {
       alert('로그인 성공');
       
