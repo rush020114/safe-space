@@ -23,13 +23,33 @@ public class MemberServiceImpl implements MemberService {
   // 회원가입
   @Transactional(rollbackFor = Exception.class)
   public void regMember(MemberDTO memberDTO){
-    // 이메일 중복 체크
-    if(memberMapper.countByEmail(memberDTO.getMemEmail().trim()) > 0){
+
+    String email = memberDTO.getMemEmail();
+    String pw = memberDTO.getMemPw();
+    String name = memberDTO.getMemName();
+
+    // 이메일 빈값 체크
+    if (email == null || email.trim().isEmpty())
+      throw new RuntimeException("아이디를 입력해주세요.");
+
+    // 이메일 중복 여부 체크
+    if (memberMapper.countByEmail(email.trim()) > 0)
       throw new RuntimeException("이미 존재하는 이메일입니다.");
-    }
+
+    // 비밀번호 빈값 체크
+    if (pw == null || pw.trim().isEmpty())
+      throw new RuntimeException("비밀번호를 입력해주세요");
+
+    // 비밀번호 최소 자리수 체크
+    if (pw.length() < 4)
+      throw new RuntimeException("비밀번호는 최소 4자리 이상이어야 합니다.");
+
+    // 이름 빈값 체크
+    if (name == null || name.trim().isEmpty())
+      throw new RuntimeException("이름을 입력해주세요");
 
     // 비밀번호 암호화
-    String encodePassword = passwordEncoder.encode(memberDTO.getMemPw());
+    String encodePassword = passwordEncoder.encode(pw);
     memberDTO.setMemPw(encodePassword);
 
     memberMapper.regMember(memberDTO);

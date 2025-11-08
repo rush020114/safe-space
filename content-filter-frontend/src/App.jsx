@@ -9,6 +9,7 @@ import ProtectedRoute from './components/auth/ProtectedRoute'
 import ProtectedAdminRoute from './components/auth/ProtectedAdminRoute'
 import Layout from './layouts/main/Layout'
 import Join from './pages/auth/Join'
+import Post from './pages/post/Post'
 
 const App = () => {
 
@@ -19,6 +20,7 @@ const App = () => {
           <Route path='' element={<div>메인페이지</div>} />
           <Route path='/login' element={<Login />} />
           <Route path='/join' element={<Join />} />
+          <Route path='/post' element={<ProtectedRoute><Post /></ProtectedRoute>} />
           <Route path='/user' element={<ProtectedRoute><div>유저</div></ProtectedRoute>} />
           <Route path='/admin' element={<ProtectedAdminRoute><div>관리자</div></ProtectedAdminRoute>} />
         </Route>

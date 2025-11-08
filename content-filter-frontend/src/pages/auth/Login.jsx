@@ -54,7 +54,13 @@ const Login = () => {
   console.log(loginInfo)
   
   return (
-    <Container className="mt-5" style={{maxWidth: '500px'}}>
+    <Container className="mt-5" style={{
+      maxWidth: '500px'
+      , border: '1px solid #cccccc'
+      , borderRadius: '8px'
+      , paddingTop: '10px'
+      , paddingBottom: '10px'
+    }}>
       <h2 className="text-center mb-4">로그인</h2>
       <Form.Group className="mb-3">
         <Form.Label>이메일</Form.Label>
