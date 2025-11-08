@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Container, Form, Button } from 'react-bootstrap';
 import { axiosInstance } from '../../apis/axiosInstance';
-import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 const Post = () => {

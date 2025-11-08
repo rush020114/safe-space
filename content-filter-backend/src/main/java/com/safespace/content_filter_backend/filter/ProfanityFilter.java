@@ -1,5 +1,6 @@
 package com.safespace.content_filter_backend.filter;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -7,12 +8,13 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 public class ProfanityFilter {
   // 욕설 단어 리스트
   // static이기 때문에 생성자가 바로 접근 가능
   private static final List<String> PROFANITY_LIST = Arrays.asList(
-          "바보", "멍청이", "돌아이", "미친놈", "개같은", "지랄", "씨발", "좆", "병신", "새끼",
+          "바보", "멍청이", "돌아이", "미친놈", "개같은", "지랄", "시발", "씨발", "좆", "병신", "새끼",
           "fuck", "shit", "bitch", "asshole", "bastard", "damn", "crap", "dick", "piss", "slut"
   );
 
@@ -39,6 +41,7 @@ public class ProfanityFilter {
 
   // 욕설 포함 여부 확인
   public boolean containsProfanity (String text){
+    log.info("욕설 확인 : {}", text);
     if(text == null || text.isEmpty()) {
       return false;
     }
