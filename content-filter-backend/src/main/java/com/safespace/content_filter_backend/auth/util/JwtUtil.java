@@ -24,6 +24,7 @@ public class JwtUtil {
   // 공통 Claims 추출 메서드. token의 payload를 추출한다.
   private Claims parseClaims(String token) {
     return Jwts.parser()
+            .verifyWith(secretKey)
             .build()
             .parseSignedClaims(token)
             .getPayload();
@@ -39,6 +40,11 @@ public class JwtUtil {
     return parseClaims(token).get("role", String.class);
   }
 
+  // memId 추출
+  public Integer getMemIdFromToken(String token) {
+    return parseClaims(token).get("memId", Integer.class);
+  }
+
   // token의 만료시간이 지났으면 true
   public boolean isExpired(String token){
     try {
@@ -49,7 +55,7 @@ public class JwtUtil {
   }
 
   // 토큰 생성 메서드
-  public String createJwt(String username, String role, long expirationTime){
+  public String createJwt(String username, String role, int memId, long expirationTime){
     return Jwts.builder()
             .signWith(secretKey, Jwts.SIG.HS512) // 암호화 방식 지정. 비밀키 & HS512 알고리즘으로 토큰 암호화 진행
             .header()
@@ -58,6 +64,7 @@ public class JwtUtil {
             .and()
               .subject(username)
               .claim("role", role)
+              .claim("memId", memId)
             .issuedAt(new Date(System.currentTimeMillis()))
             .expiration(new Date(System.currentTimeMillis() + expirationTime))
             .compact();

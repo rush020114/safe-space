@@ -1,6 +1,7 @@
 package com.safespace.content_filter_backend.auth.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.safespace.content_filter_backend.auth.dto.CustomUserDetails;
 import com.safespace.content_filter_backend.auth.util.JwtUtil;
 import com.safespace.content_filter_backend.member.dto.MemberDTO;
 import jakarta.servlet.FilterChain;
@@ -86,7 +87,10 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     // 토큰 생성을 위한 아이디 정보 추출
     String username = authResult.getName();
 
-    System.out.println("username : " + username);
+    // 토큰 생성을 위한 실제 아이디 추출
+    CustomUserDetails userDetails = (CustomUserDetails) authResult.getPrincipal();
+    MemberDTO memberDTO = userDetails.getMemberDTO();
+    int memId = memberDTO.getMemId();
 
     // 토큰 생성을 위한 권한 정보 추출
     Collection<? extends GrantedAuthority> authorities = authResult.getAuthorities();
@@ -95,7 +99,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     String role = auth.getAuthority();
 
     // 토큰 생성
-    String accessToken = jwtUtil.createJwt(username, role, (1000 * 60 * 10));
+    String accessToken = jwtUtil.createJwt(username, role, memId, (1000 * 60 * 10));
 
     // 생성한 토큰을 응답 헤더에 담아 클라이언트에 전달
     // Authorization 헤더는 클라이언트가 접근하면 안 되므로 기본적으로 정보를 숨기는데 이를 명시적으로 보여주기 위한 설정 코드이다.

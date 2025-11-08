@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { Container, Form, Button } from 'react-bootstrap';
 import { axiosInstance } from '../../apis/axiosInstance';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 const Post = () => {
+  const nav = useNavigate();
 
   // 게시글 정보를 저장할 state 변수
   const [postInfo, setPostInfo] = useState({
@@ -18,6 +21,7 @@ const Post = () => {
     });
   };
   
+  // 게시글 등록함수
   const regPost = () => {
     axiosInstance.post('/posts', postInfo)
     .then(res => {
@@ -28,6 +32,7 @@ const Post = () => {
       if (e.response) {
         // 서버가 응답했지만 오류 상태일 때
         alert(e.response.data);
+        console.log(e);
       } else if (e.request) {
         // 요청은 보냈지만 응답이 없을 때
         alert("서버로부터 응답이 없습니다.");
@@ -37,6 +42,8 @@ const Post = () => {
       };
     });
   };
+
+  console.log(postInfo);
   return (
     <Container style={{ maxWidth: '600px', marginTop: '40px' }}>
       <h2 className="mb-4">글쓰기</h2>
@@ -45,7 +52,7 @@ const Post = () => {
         <Form.Control 
           type="text" 
           name='postTitle'
-          value={postInfo.title}
+          value={postInfo.postTitle}
           onChange={e => handlePostInfo(e)}
           placeholder="제목을 입력하세요" 
         />
@@ -56,7 +63,7 @@ const Post = () => {
         <Form.Control
           as="textarea" 
           name='postContent'
-          value={postInfo.title}
+          value={postInfo.postContent}
           onChange={e => handlePostInfo(e)}
           rows={10} 
           placeholder="내용을 입력하세요" 

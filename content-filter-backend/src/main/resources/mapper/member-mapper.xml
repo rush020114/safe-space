@@ -19,7 +19,8 @@
 
     <!-- 로그인하려는 회원 정보 조회 -->
     <select id="getMemberForLogin" resultMap="member">
-        SELECT MEM_EMAIL
+        SELECT MEM_ID
+            , MEM_EMAIL
             , MEM_PW
             , MEM_ROLE
             , MEM_NAME

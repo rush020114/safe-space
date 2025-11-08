@@ -3,13 +3,15 @@ package com.safespace.content_filter_backend.post.service;
 import com.safespace.content_filter_backend.post.dto.PostDTO;
 import com.safespace.content_filter_backend.post.mapper.PostMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PostService {
-  public PostMapper postMapper;
+  public final PostMapper postMapper;
 
   // 게시글 등록
   @Transactional(rollbackFor = Exception.class)
@@ -27,6 +29,7 @@ public class PostService {
     int postId = postMapper.getPostId();
     postDTO.setPostId(postId);
 
+    log.info("postDTO의 값 : {}", postDTO);
     // 게시글 등록
     postMapper.regPost(postDTO);
   }

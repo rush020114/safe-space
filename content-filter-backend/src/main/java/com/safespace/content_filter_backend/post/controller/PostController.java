@@ -1,15 +1,14 @@
 package com.safespace.content_filter_backend.post.controller;
 
+import com.safespace.content_filter_backend.auth.util.JwtUtil;
 import com.safespace.content_filter_backend.post.dto.PostDTO;
 import com.safespace.content_filter_backend.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -17,10 +16,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class PostController {
   private final PostService postService;
+  private final JwtUtil jwtUtil;
 
   @PostMapping("")
-  public ResponseEntity<?> regPost(@RequestBody PostDTO postDTO){
+  @PreAuthorize("isAuthenticated()")
+  public ResponseEntity<?> regPost(@RequestBody PostDTO postDTO, @RequestHeader("Authorization") String token){
     try {
+      // 토큰으로 memId 추출
+      String jwt = token.replace("Bearer ", "");
+      System.out.println("jwt 토큰 : " + jwt);
+      postDTO.setMemId(jwtUtil.getMemIdFromToken(jwt));
+      // 게시글 등록
       postService.regPost(postDTO);
       log.info("게시글 등록 성공");
       return ResponseEntity
