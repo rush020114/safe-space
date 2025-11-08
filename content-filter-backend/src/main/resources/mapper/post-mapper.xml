@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 해당 파일에 모든 쿼리문을 작성 -->
+<!-- namespace에는 xml파일과 연결할 Mapper interface 파일명을 패키지를 포함하여 적어주세요 -->
+<mapper namespace="com.safespace.content_filter_backend.post.mapper.PostMapper">
+    <resultMap id="post" type="com.safespace.content_filter_backend.post.dto.PostDTO">
+        <result column="POST_ID"       property="postId" />
+        <result column="POST_TITLE"    property="postTitle" />
+        <result column="POST_CONTENT"  property="postContent" />
+        <result column="IS_FILTERED"   property="isFiltered" />
+        <result column="CREATED_AT"    property="createdAt" />
+        <result column="MEM_ID"        property="memId" />
+    </resultMap>
+
+    <!-- 게시글 등록 -->
+    <insert id="regPost">
+        INSERT INTO POST (
+            POST_ID
+            , POST_TITLE
+            , POST_CONTENT
+            , MEM_ID
+        ) VALUES (
+            #{postId}
+            , #{postTitle}
+            , #{postContent}
+            , #{memId}
+        )
+    </insert>
+
+    <!-- 게시글 번호 조회 -->
+    <select id="getPostId">
+        SELECT IFNULL(MAX(POST_ID, 0) + 1
+        FROM POST
+    </select>
+</mapper>

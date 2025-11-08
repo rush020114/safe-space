@@ -9,7 +9,7 @@ const ProtectedAdminRoute = ({children}) => {
   
   useEffect(() => {
     if(!isAdmin(token)){
-      alert('로그인이 필요합니다. \n 첫페이지로 이동합니다.')
+      alert('접근 권한이 없습니다. \n 첫페이지로 이동합니다.')
       setIsAccessible(false);
     } else {
       setIsAccessible(true);

@@ -29,7 +29,7 @@ const Header = () => {
                     {
                       isAdmin(token)
                       &&
-                      <NavDropdown.Item as={Link} to="">관리자 페이지</NavDropdown.Item>
+                      <NavDropdown.Item as={Link} to="">운영 관리</NavDropdown.Item>
                     }
                     <NavDropdown.Divider />
                     <NavDropdown.Item 

@@ -38,8 +38,8 @@ const Join = () => {
       } else {
         // 요청 설정 중 오류 발생
         alert("요청 중 오류 발생: " + e.message);
-      }
-    })
+      };
+    });
   };
 
   console.log(joinInfo);

@@ -6,6 +6,7 @@ import com.safespace.content_filter_backend.auth.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -51,7 +52,7 @@ public class SecurityConfig {
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             // 인증 및 인가에 대한 접근 설정
             .authorizeHttpRequests(auth ->
-                    auth.requestMatchers("/test1").authenticated() // 인증 정보를 가지고 있는 사람만 접근 가능
+                    auth.requestMatchers(HttpMethod.POST, "/posts").authenticated() // 인증 정보를 가지고 있는 사람만 접근 가능
                         .requestMatchers("/test2").hasRole("ADMIN") // ADMIN 권한만 접근 가능
                         .requestMatchers("/test3").hasAnyRole("MANAGER, ADMIN") // MANAGER, ADMIN 접근 가능
                         .anyRequest().permitAll() // 위 요청을 제외한 나머지 요청 접근 가능

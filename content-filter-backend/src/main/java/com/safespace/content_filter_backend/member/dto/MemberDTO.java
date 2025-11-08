@@ -16,6 +16,9 @@ public class MemberDTO {
   private String memName;
   private String memRole;
   private LocalDateTime createdAt;
+  private String memStatus;
+  private int warningCnt;
+  private LocalDateTime bannedUntil;
 
   public MemberDTO(){
   }
