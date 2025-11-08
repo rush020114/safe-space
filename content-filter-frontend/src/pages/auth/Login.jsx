@@ -56,37 +56,35 @@ const Login = () => {
   return (
     <Container className="mt-5" style={{maxWidth: '500px'}}>
       <h2 className="text-center mb-4">로그인</h2>
-      <Form>
-        <Form.Group className="mb-3">
-          <Form.Label>이메일</Form.Label>
-          <Form.Control
-            type="text"
-            name="memEmail"
-            value={loginInfo.memEmail}
-            onChange={e => handleUserInfo(e)}
-            placeholder="이메일 입력"
-          />
-        </Form.Group>
+      <Form.Group className="mb-3">
+        <Form.Label>이메일</Form.Label>
+        <Form.Control
+          type="text"
+          name="memEmail"
+          value={loginInfo.memEmail}
+          onChange={e => handleUserInfo(e)}
+          placeholder="이메일 입력"
+        />
+      </Form.Group>
 
-        <Form.Group className="mb-3">
-          <Form.Label>비밀번호</Form.Label>
-          <Form.Control
-            type="password"
-            name="memPw"
-            value={loginInfo.memPw}
-            onChange={e => handleUserInfo(e)}
-            placeholder="비밀번호 입력"
-          />
-        </Form.Group>
+      <Form.Group className="mb-3">
+        <Form.Label>비밀번호</Form.Label>
+        <Form.Control
+          type="password"
+          name="memPw"
+          value={loginInfo.memPw}
+          onChange={e => handleUserInfo(e)}
+          placeholder="비밀번호 입력"
+        />
+      </Form.Group>
 
-        <Button
-          type="button"
-          onClick={() => login()}
-          className="w-100"
-        >
-          로그인
-        </Button>
-      </Form>
+      <Button
+        type="button"
+        onClick={() => login()}
+        className="w-100"
+      >
+        로그인
+      </Button>
     </Container>
   )
 }

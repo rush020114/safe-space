@@ -35,4 +35,11 @@
             , #{memName}
         )
     </insert>
+
+    <!-- 이메일 중복 조회 -->
+    <select id="countByEmail" resultType="int">
+        SELECT COUNT(*)
+        FROM MEMBER
+        WHERE MEM_EMAIL = #{memEmail}
+    </select>
 </mapper>
