@@ -25,6 +25,7 @@ repositories {
 }
 
 dependencies {
+	implementation 'org.openkoreantext:open-korean-text:2.1.0' // open korean text 라이브러리
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	testImplementation 'org.springframework.security:spring-security-test'
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.3'

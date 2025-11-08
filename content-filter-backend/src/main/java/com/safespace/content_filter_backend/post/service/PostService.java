@@ -1,6 +1,6 @@
 package com.safespace.content_filter_backend.post.service;
 
-import com.safespace.content_filter_backend.filter.ProfanityFilter;
+import com.safespace.content_filter_backend.profanity.filter.ProfanityFilter;
 import com.safespace.content_filter_backend.post.dto.PostDTO;
 import com.safespace.content_filter_backend.post.mapper.PostMapper;
 import lombok.RequiredArgsConstructor;
