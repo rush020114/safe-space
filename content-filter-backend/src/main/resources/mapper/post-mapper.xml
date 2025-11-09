@@ -28,6 +28,19 @@
         )
     </insert>
 
+    <!-- 게시글 이미지 등록 -->
+    <insert id="regPostImg">
+        INSERT INTO POST_IMG (
+            ORIGIN_IMG_NAME
+            , ATTACHED_IMG_NAME
+            , POST_ID
+        ) VALUES (
+            #{originImgName}
+            , #{attachedImgName}
+            , #{postId}
+        )
+    </insert>
+
     <!-- 게시글 번호 조회 -->
     <select id="getPostId">
         SELECT IFNULL(MAX(POST_ID), 0) + 1

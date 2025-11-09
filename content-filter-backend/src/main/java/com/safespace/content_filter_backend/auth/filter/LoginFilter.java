@@ -99,7 +99,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     String role = auth.getAuthority();
 
     // 토큰 생성
-    String accessToken = jwtUtil.createJwt(username, role, memId, (1000 * 60 * 10));
+    String accessToken = jwtUtil.createJwt(username, role, memId, (1000 * 60 * 20));
 
     // 생성한 토큰을 응답 헤더에 담아 클라이언트에 전달
     // Authorization 헤더는 클라이언트가 접근하면 안 되므로 기본적으로 정보를 숨기는데 이를 명시적으로 보여주기 위한 설정 코드이다.

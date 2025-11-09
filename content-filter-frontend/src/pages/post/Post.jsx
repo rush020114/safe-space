@@ -6,6 +6,9 @@ import { useNavigate } from 'react-router-dom';
 const Post = () => {
   const nav = useNavigate();
 
+  // 파일을 저장할 state 변수 
+  const [file, setFile] = useState(null);
+
   // 게시글 정보를 저장할 state 변수
   const [postInfo, setPostInfo] = useState({
     postTitle: ''
@@ -22,7 +25,18 @@ const Post = () => {
   
   // 게시글 등록함수
   const regPost = () => {
-    axiosInstance.post('/posts', postInfo)
+
+    const fileConfig = {'Content-Type': 'multipart/form-data'}
+
+    const formData = new FormData();
+
+    formData.append("postImg", file);
+    formData.append("postTitle", postInfo.postTitle);
+    formData.append("postContent", postInfo.postContent);
+
+    axiosInstance.post('/posts', formData, {
+      headers: fileConfig
+    })
     .then(res => {
       alert(res.data);
       nav('/')
@@ -42,7 +56,7 @@ const Post = () => {
     });
   };
 
-  console.log(postInfo);
+  console.log(file);
   return (
     <Container style={{ maxWidth: '600px', marginTop: '40px' }}>
       <h2 className="mb-4">글쓰기</h2>
@@ -71,7 +85,11 @@ const Post = () => {
 
       <Form.Group className="mb-3" controlId="formFile">
         <Form.Label>파일 업로드</Form.Label>
-        <Form.Control type="file" multiple />
+        <Form.Control 
+          type="file" 
+          onChange={e => setFile(e.target.files[0])}
+          multiple 
+        />
       </Form.Group>
 
       <Button 

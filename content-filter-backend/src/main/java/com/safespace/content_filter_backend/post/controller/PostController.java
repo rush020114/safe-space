@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @RestController
@@ -20,14 +21,18 @@ public class PostController {
 
   @PostMapping("")
   @PreAuthorize("isAuthenticated()")
-  public ResponseEntity<?> regPost(@RequestBody PostDTO postDTO, @RequestHeader("Authorization") String token){
+  public ResponseEntity<?> regPost(
+          @RequestParam (name = "postImg", required = false) MultipartFile postImg
+          , PostDTO postDTO
+          , @RequestHeader("Authorization") String token){
     try {
+      log.info("이미지 파일 : {}", postImg);
       // 토큰으로 memId 추출
       String jwt = token.replace("Bearer ", "");
       System.out.println("jwt 토큰 : " + jwt);
       postDTO.setMemId(jwtUtil.getMemIdFromToken(jwt));
       // 게시글 등록
-      postService.regPost(postDTO);
+      postService.regPost(postImg, postDTO);
       log.info("게시글 등록 성공");
       return ResponseEntity
               .status(HttpStatus.CREATED)
