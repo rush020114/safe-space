@@ -1,6 +1,5 @@
 package com.safespace.content_filter_backend.post.service;
 
-import com.safespace.content_filter_backend.content_filter.HarmfulImageDetector;
 import com.safespace.content_filter_backend.content_filter.ProfanityFilter;
 import com.safespace.content_filter_backend.post.dto.PostDTO;
 import com.safespace.content_filter_backend.post.dto.PostImgDTO;
@@ -19,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class PostService {
   public final PostMapper postMapper;
   public final ProfanityFilter profanityFilter;
-  public final HarmfulImageDetector harmfulImageDetector;
 
   // 게시글 등록
   @Transactional(rollbackFor = Exception.class)
@@ -39,11 +37,6 @@ public class PostService {
 
     if(profanityFilter.containsProfanity(content)){
       throw new RuntimeException("내용에 부적절한 단어가 포함되어 있습니다.");
-    }
-
-    // 유해 이미지 판단
-    if (harmfulImageDetector.isHarmful(postImg)){
-      throw new RuntimeException("부적절한 이미지가 포함되어 있습니다.");
     }
 
     // 게시글 번호 조회
