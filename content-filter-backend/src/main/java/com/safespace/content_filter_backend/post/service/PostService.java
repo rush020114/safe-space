@@ -66,4 +66,9 @@ public class PostService {
     log.info("getPostList 실행");
     return postMapper.getPostList();
   }
+
+  // 게시글 상세 조회
+  public PostDTO getPostDetail(int postId){
+    return postMapper.getPostDetail(postId);
+  }
 }

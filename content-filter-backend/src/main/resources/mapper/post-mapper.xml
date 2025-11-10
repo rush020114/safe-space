@@ -60,7 +60,6 @@
         SELECT
             p.POST_ID
             , POST_TITLE
-            , POST_CONTENT
             , CREATED_AT
             , MEM_ID
             , IMG_NUM
@@ -70,5 +69,22 @@
         ON p.POST_ID = i.POST_ID
         WHERE IS_FILTERED = 'N'
         ORDER BY CREATED_AT DESC
+    </select>
+
+    <!-- 게시글 상세 조회 -->
+    <select id="getPostDetail" resultMap="post">
+        SELECT
+            p.POST_ID
+            , POST_TITLE
+            , POST_CONTENT
+            , CREATED_AT
+            , MEM_ID
+            , IMG_NUM
+            , ATTACHED_IMG_NAME
+        FROM POST p
+        LEFT JOIN POST_IMG i
+        ON p.POST_ID = i.POST_ID
+        WHERE p.POST_ID = #{postId}
+        AND IS_FILTERED = 'N'
     </select>
 </mapper>

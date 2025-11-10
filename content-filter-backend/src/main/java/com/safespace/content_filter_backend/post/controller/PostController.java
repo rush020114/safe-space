@@ -57,11 +57,26 @@ public class PostController {
       return ResponseEntity
               .status(HttpStatus.OK)
               .body(postService.getPostList());
-    } catch (RuntimeException e) {
+    } catch (Exception e) {
+      e.printStackTrace();
       return ResponseEntity
               .status(HttpStatus.INTERNAL_SERVER_ERROR)
               .body(e.getMessage());
     }
+  }
 
+  // 게시글 상세 조회
+  @GetMapping("/{postId}")
+  public ResponseEntity<?> getPostDetail(@PathVariable("postId") int postId){
+    try{
+      return ResponseEntity
+              .status(HttpStatus.OK)
+              .body(postService.getPostDetail(postId));
+    } catch (Exception e){
+      e.printStackTrace();
+      return ResponseEntity
+              .status(HttpStatus.INTERNAL_SERVER_ERROR)
+              .body(e.getMessage());
+    }
   }
 }

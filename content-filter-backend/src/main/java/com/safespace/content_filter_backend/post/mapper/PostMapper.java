@@ -19,4 +19,7 @@ public interface PostMapper {
 
   // 게시글 목록 조회
   List<PostDTO> getPostList();
+
+  // 게시글 상세 조회
+  PostDTO getPostDetail(int postId);
 }

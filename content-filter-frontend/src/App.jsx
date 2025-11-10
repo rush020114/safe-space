@@ -10,7 +10,8 @@ import ProtectedAdminRoute from './components/auth/ProtectedAdminRoute'
 import Layout from './layouts/main/Layout'
 import Join from './pages/auth/Join'
 import Post from './pages/post/Post'
-import MainPage from './pages/main/MainPage'
+import PostList from './pages/post/PostList'
+import PostDetail from './pages/post/PostDetail'
 
 const App = () => {
 
@@ -18,10 +19,11 @@ const App = () => {
     <>
       <Routes>
         <Route path='/' element={<Layout />}>
-          <Route path='' element={<MainPage />} />
+          <Route path='' element={<PostList />} />
           <Route path='/login' element={<Login />} />
           <Route path='/join' element={<Join />} />
           <Route path='/post' element={<ProtectedRoute><Post /></ProtectedRoute>} />
+          <Route path='/post-detail/:postId' element={<PostDetail />} />
           <Route path='/user' element={<ProtectedRoute><div>유저</div></ProtectedRoute>} />
           <Route path='/admin' element={<ProtectedAdminRoute><div>관리자</div></ProtectedAdminRoute>} />
         </Route>
