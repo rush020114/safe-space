@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Container, Form, Button } from 'react-bootstrap';
 import { axiosInstance } from '../../apis/axiosInstance';
-import { useNavigate } from 'react-router-dom';
+import { href, useNavigate } from 'react-router-dom';
 
 const Post = () => {
   const nav = useNavigate();
@@ -42,7 +42,10 @@ const Post = () => {
       nav('/')
     })
     .catch(e => {
-      if (e.response) {
+      if (e.status === 403){
+        alert('세션이 만료되었습니다.')
+        window.location.replace('/');
+      } else if (e.response) {
         // 서버가 응답했지만 오류 상태일 때
         alert(e.response.data);
         console.log(e);

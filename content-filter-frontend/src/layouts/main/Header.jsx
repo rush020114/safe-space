@@ -13,7 +13,7 @@ const Header = () => {
   return (
     <Navbar bg="light" data-bs-theme="light">
       <Container>
-        <Navbar.Brand as={Link} to="/">SAFE SPACE</Navbar.Brand>
+        <Navbar.Brand href="/">SAFE SPACE</Navbar.Brand>
         <Nav className="ms-auto align-items-center">
           {
             isAuthenticated(token)

@@ -49,4 +49,19 @@ public class PostController {
               .body("게시글 등록 중 서버 오류 발생");
     }
   }
+
+  // 게시글 목록 조회
+  @GetMapping("")
+  public ResponseEntity<?> getPostList(){
+    try {
+      return ResponseEntity
+              .status(HttpStatus.OK)
+              .body(postService.getPostList());
+    } catch (RuntimeException e) {
+      return ResponseEntity
+              .status(HttpStatus.INTERNAL_SERVER_ERROR)
+              .body(e.getMessage());
+    }
+
+  }
 }

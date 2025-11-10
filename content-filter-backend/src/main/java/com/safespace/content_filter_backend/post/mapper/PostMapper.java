@@ -4,6 +4,8 @@ import com.safespace.content_filter_backend.post.dto.PostDTO;
 import com.safespace.content_filter_backend.post.dto.PostImgDTO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 @Mapper
 public interface PostMapper {
   // 게시글 등록
@@ -14,4 +16,7 @@ public interface PostMapper {
 
   // 게시글 번호 조회
   int getPostId();
+
+  // 게시글 목록 조회
+  List<PostDTO> getPostList();
 }

@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -57,6 +59,11 @@ public class PostService {
       postImgDTO.setPostId(postId);
       postMapper.regPostImg(postImgDTO);
     }
+  }
 
+  // 게시글 목록 조회
+  public List<PostDTO> getPostList(){
+    log.info("getPostList 실행");
+    return postMapper.getPostList();
   }
 }

@@ -5,7 +5,7 @@
 <!-- namespace에는 xml파일과 연결할 Mapper interface 파일명을 패키지를 포함하여 적어주세요 -->
 <mapper namespace="com.safespace.content_filter_backend.member.mapper.MemberMapper">
 	<resultMap id="member" type="com.safespace.content_filter_backend.member.dto.MemberDTO">
-        <result column="MEM_ID"        property="memId" />
+        <id     column="MEM_ID"        property="memId" />
         <result column="MEM_EMAIL"     property="memEmail" />
         <result column="MEM_PW"        property="memPw" />
         <result column="MEM_NAME"      property="memName" />

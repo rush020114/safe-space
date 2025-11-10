@@ -16,6 +16,7 @@ public class PostDTO {
   private String isFiltered;
   private LocalDateTime createdAt;
   private int memId;
+  private PostImgDTO postImgDTO;
 
   public PostDTO() {
   }
