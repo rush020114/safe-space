@@ -55,7 +55,7 @@ public class SecurityConfig {
                     auth.requestMatchers(HttpMethod.POST ,"/posts").authenticated() // 인증 정보를 가지고 있는 사람만 접근 가능
                         .requestMatchers(HttpMethod.POST, "/comments").authenticated()
                         .requestMatchers(HttpMethod.POST, "/reports").authenticated()
-                        .requestMatchers("/test2").hasRole("ADMIN") // ADMIN 권한만 접근 가능
+                        .requestMatchers("/admin", "/admin/**").hasRole("ADMIN") // ADMIN 권한만 접근 가능
                         .requestMatchers("/test3").hasAnyRole("MANAGER, ADMIN") // MANAGER, ADMIN 접근 가능
                         .anyRequest().permitAll() // 위 요청을 제외한 나머지 요청 접근 가능
             );

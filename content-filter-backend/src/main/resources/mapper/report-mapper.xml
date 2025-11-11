@@ -37,4 +37,9 @@
         AND TARGET_ID = #{targetId}
         AND REPORTER_ID = #{reporterId}
     </select>
+
+    <!-- 관리자 신고 목록 조회 -->
+    <select id="getReportListForAdmin" resultMap="report">
+
+    </select>
 </mapper>

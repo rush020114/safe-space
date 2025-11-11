@@ -14,7 +14,11 @@ const ReportModal = ({ show, handleClose, handleSubmit }) => {
   };
 
   return (
-    <Modal show={show} onHide={handleClose} centered>
+    <Modal show={show} onHide={() => {
+        handleClose();
+        setSelectedReason("");
+        setCustomReason("");
+      }} centered>
       <Modal.Header closeButton>
         <Modal.Title>댓글 신고</Modal.Title>
       </Modal.Header>
@@ -67,7 +71,11 @@ const ReportModal = ({ show, handleClose, handleSubmit }) => {
         </Form>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
+        <Button variant="secondary" onClick={() => {
+            handleClose();
+            setSelectedReason("");
+            setCustomReason("");
+          }}>
           취소
         </Button>
         <Button
