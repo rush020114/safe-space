@@ -60,17 +60,4 @@ SELECT * FROM member;
 SELECT * FROM post;
 SELECT * FROM POST_IMG;
 SELECT * FROM CMT;
-SELECT * FROM REPORT;
-SELECT
-            p.POST_ID
-            , POST_TITLE
-            , POST_CONTENT
-            , CREATED_AT
-            , MEM_ID
-            , IMG_NUM
-            , ATTACHED_IMG_NAME
-        FROM POST p
-        LEFT JOIN POST_IMG i
-        ON p.POST_ID = i.POST_ID
-        WHERE IS_FILTERED = 'N'
-        ORDER BY CREATED_AT DESC;
+SELECT * FROM report;

@@ -12,6 +12,7 @@
         <result column="CREATED_AT"    property="createdAt" />
         <result column="MEM_ID"        property="memId" />
         <association property="postImgDTO" resultMap="postImg" />
+        <collection property="commentDTOList" resultMap="com.safespace.content_filter_backend.comment.mapper.CommentMapper.comment" />
     </resultMap>
 
     <resultMap id="postImg" type="com.safespace.content_filter_backend.post.dto.PostImgDTO">
@@ -77,14 +78,22 @@
             p.POST_ID
             , POST_TITLE
             , POST_CONTENT
-            , CREATED_AT
-            , MEM_ID
+            , p.CREATED_AT
+            , p.MEM_ID
             , IMG_NUM
             , ATTACHED_IMG_NAME
+            , CMT_ID
+            , CMT_CONTENT
+            , C.CREATED_AT
+            , C.IS_FILTERED
         FROM POST p
         LEFT JOIN POST_IMG i
         ON p.POST_ID = i.POST_ID
+        LEFT JOIN CMT C
+        ON P.POST_ID = C.POST_ID
         WHERE p.POST_ID = #{postId}
-        AND IS_FILTERED = 'N'
+        AND p.IS_FILTERED = 'N'
+        AND C.IS_FILTERED = 'N'
     </select>
+
 </mapper>

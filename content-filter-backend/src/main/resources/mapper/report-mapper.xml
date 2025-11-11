@@ -14,4 +14,27 @@
         <result column="REPORTER_ID"    property="reporterId" />
     </resultMap>
 
+    <!-- 신고 등록 -->
+    <insert id="regReport">
+        INSERT INTO REPORT (
+            TARGET_TYPE
+            , TARGET_ID
+            , REPORT_REASON
+            , REPORTER_ID
+        ) VALUES (
+            #{targetType}
+            , #{targetId}
+            , #{reportReason}
+            , #{reporterId}
+        )
+    </insert>
+
+    <!-- 신고 중복 확인 -->
+    <select id="getDupReport" resultType="int">
+        SELECT COUNT(*)
+        FROM REPORT
+        WHERE TARGET_TYPE = #{targetType}
+        AND TARGET_ID = #{targetId}
+        AND REPORTER_ID = #{reporterId}
+    </select>
 </mapper>

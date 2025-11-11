@@ -1,6 +1,6 @@
 import { Navbar, Container, Nav, Button, NavDropdown } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { isAdmin, isAuthenticated } from '../../apis/authCheck';
 import { logoutReducer } from '../../redux/authSlice';
 import { jwtDecode } from 'jwt-decode';
@@ -9,6 +9,7 @@ const Header = () => {
   const token = useSelector(state => state.auth.token);
   const dispatch = useDispatch();
   const username = token ? jwtDecode(token).sub : null
+  const nav = useNavigate();
 
   return (
     <Navbar bg="light" data-bs-theme="light">
@@ -33,7 +34,10 @@ const Header = () => {
                     }
                     <NavDropdown.Divider />
                     <NavDropdown.Item 
-                      onClick={() => dispatch(logoutReducer())}
+                      onClick={() => {
+                        dispatch(logoutReducer());
+                        nav('/')
+                      }}
                       className="text-danger"
                     >
                       로그아웃

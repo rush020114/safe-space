@@ -1,18 +1,27 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Card, Container, Dropdown } from 'react-bootstrap'
+import { Card, Container, Dropdown } from 'react-bootstrap'
 import { axiosInstance } from '../../apis/axiosInstance';
 import { SERVER_URL } from '../../constants/appConst';
 import dayjs from 'dayjs';
 import { useSelector } from 'react-redux';
 import { jwtDecode } from 'jwt-decode';
-import { isAuthenticated } from '../../apis/authCheck';
+import { isAdmin, isAuthenticated } from '../../apis/authCheck';
 import { useNavigate } from 'react-router-dom';
+import ReportModal from '../../components/modal/ReportModal';
 
 const PostList = () => {
   const token = useSelector(state => state.auth.token);
-  const username = token ? jwtDecode(token).sub : null
+  const loginData = token ? jwtDecode(token) : null
 
   const nav = useNavigate();
+
+  const [reportTarget, setReportTarget] = useState({
+    type: "", // 'POST' or 'COMMENT'
+    id: null  // postId or commentId
+  });
+
+  // 신고 모달을 띄울 state 변수
+  const [showReportModal, setShowReportModal] = useState(false);
   
   // 게시글 목록을 저장할 state 변수
   const [postList, setPostList] = useState([]);
@@ -24,7 +33,26 @@ const PostList = () => {
     .catch(e => console.log(e));
   }, []);
 
+  // 신고 모달에 들어갈 신고글 유형과 아이디를 세팅할 함수
+  const handleReportClick = (type, id) => {
+    setReportTarget({type, id});
+    setShowReportModal(true);
+  };
+
+  // 신고 이유를 저장할 함수
+  const handleReportReason = reason => {
+    axiosInstance.post(`${SERVER_URL}/reports`, {
+      targetType: reportTarget.type,
+      targetId: reportTarget.id,
+      reporterId: loginData.memId,
+      reportReason: reason
+    })
+  };
+
+
   console.log(postList);
+  console.log(loginData);
+  console.log(reportTarget);
 
   return (
     <Container style={{ maxWidth: "800px", marginTop: "40px" }}>
@@ -64,7 +92,7 @@ const PostList = () => {
                 </small>
                 <Dropdown align="end">
                   <Dropdown.Toggle
-                    variant="outline-primary"
+                    variant=""
                     size="sm"
                   >
                     <span style={{ marginRight: "10px" }}>⋮</span>
@@ -72,7 +100,7 @@ const PostList = () => {
 
                   <Dropdown.Menu>
                     {
-                      username === post.memId
+                      loginData?.memId === post.memId
                       &&
                       <>
                         <Dropdown.Item onClick={() => console.log("수정 클릭")}>수정</Dropdown.Item>
@@ -80,10 +108,26 @@ const PostList = () => {
                         <Dropdown.Divider />
                       </>
                     }
-                    <Dropdown.Item
-                      onClick={() => isAuthenticated(token) ? null : alert('로그인 후 이용해주세요.')}
-                      className='text-danger'
-                    >신고</Dropdown.Item>
+                    {
+                      isAdmin(token)
+                      ?
+                      <Dropdown.Item
+                        onClick={() => isAuthenticated(token) ? null : alert('로그인 후 이용해주세요.')}
+                        className='text-danger'
+                      >신고 및 삭제</Dropdown.Item>
+                      :
+                      <>
+                        <Dropdown.Item
+                          onClick={() => isAuthenticated(token) ? handleReportClick("POST", post.postId) : alert('로그인 후 이용해주세요.')}
+                          className='text-danger'
+                        >신고</Dropdown.Item>
+                        <ReportModal
+                          show={showReportModal}
+                          handleClose={() => setShowReportModal(false)}
+                          handleSubmit={handleReportReason}
+                        />
+                      </>
+                    }
                   </Dropdown.Menu>
                 </Dropdown>
               </div>

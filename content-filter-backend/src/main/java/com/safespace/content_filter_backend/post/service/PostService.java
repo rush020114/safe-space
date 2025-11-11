@@ -27,9 +27,11 @@ public class PostService {
     String title = postDTO.getPostTitle();
     String content = postDTO.getPostContent();
 
+    // 제목이 없다면
     if(title == null || title.trim().isEmpty())
       throw new RuntimeException("제목을 입력해주세요.");
 
+    // 내용이 없다면
     if(content == null || content.trim().isEmpty())
       throw new RuntimeException("내용을 입력해주세요");
 

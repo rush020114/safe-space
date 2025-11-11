@@ -43,8 +43,8 @@ const Post = () => {
     })
     .catch(e => {
       if (e.status === 403){
-        alert('세션이 만료되었습니다.')
-        window.location.replace('/');
+        alert('세션이 만료되어 로그인이 필요합니더.')
+        window.location.replace('/login');
       } else if (e.response) {
         // 서버가 응답했지만 오류 상태일 때
         alert(e.response.data);
@@ -94,7 +94,6 @@ const Post = () => {
           multiple 
         />
       </Form.Group>
-
       <Button 
         variant="primary" 
         type="button"

@@ -13,8 +13,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @RestController
-@RequestMapping("/posts")
 @RequiredArgsConstructor
+@RequestMapping("/posts")
 public class PostController {
   private final PostService postService;
   private final JwtUtil jwtUtil;
@@ -24,12 +24,13 @@ public class PostController {
   public ResponseEntity<?> regPost(
           @RequestParam (name = "postImg", required = false) MultipartFile postImg
           , PostDTO postDTO
-          , @RequestHeader("Authorization") String token){
+          , @RequestHeader("Authorization") String token
+  ){
     try {
       log.info("이미지 파일 : {}", postImg);
       // 토큰으로 memId 추출
       String jwt = token.replace("Bearer ", "");
-      System.out.println("jwt 토큰 : " + jwt);
+      log.info("post jwt 토큰 : {}", jwt);
       postDTO.setMemId(jwtUtil.getMemIdFromToken(jwt));
       // 게시글 등록
       postService.regPost(postImg, postDTO);
@@ -43,7 +44,7 @@ public class PostController {
               .status(HttpStatus.BAD_REQUEST)
               .body(e.getMessage());
     } catch (Exception e) {
-      log.info("회원가입 실패 - 서버 오류", e);
+      log.info("게시글 등록 실패 - 서버 오류", e);
       return ResponseEntity
               .status(HttpStatus.INTERNAL_SERVER_ERROR)
               .body("게시글 등록 중 서버 오류 발생");

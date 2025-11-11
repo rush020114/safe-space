@@ -12,4 +12,18 @@
         <result column="POST_ID"       property="postId" />
         <result column="MEM_ID"        property="memId" />
     </resultMap>
+
+    <!-- 댓글 등록  -->
+    <insert id="regComment">
+        INSERT INTO CMT (
+            CMT_CONTENT
+            , POST_ID
+            , MEM_ID
+        ) VALUES (
+            #{cmtContent}
+            , #{postId}
+            , #{memId}
+        )
+    </insert>
+
 </mapper>
