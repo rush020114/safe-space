@@ -25,4 +25,11 @@ public class ReportService {
 
     reportMapper.regReport(reportDTO);
   }
+
+  // 관리자 신고 조회
+  public void getReportListForAdmin(String targetType){
+    if(targetType == null || (!targetType.equals("POST") && !targetType.equals("COMMENT"))){
+
+    }
+  }
 }

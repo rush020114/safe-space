@@ -10,4 +10,7 @@ public interface ReportMapper {
 
   // 신고 중복
   int getDupReport(ReportDTO reportDTO);
+
+  // 관리자 신고 조회
+  void getReportListForAdmin(String targetType);
 }

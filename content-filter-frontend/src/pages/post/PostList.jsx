@@ -83,7 +83,11 @@ const PostList = () => {
                       <>
                         <Dropdown.Item onClick={() => console.log("수정 클릭")}>수정</Dropdown.Item>
                         <Dropdown.Item onClick={() => console.log("삭제 클릭")}>삭제</Dropdown.Item>
-                        <Dropdown.Divider />
+                        {
+                          loginData?.memId !== post.memId
+                          &&
+                          <Dropdown.Divider />
+                        }
                       </> 
                     }
                     {
@@ -97,12 +101,16 @@ const PostList = () => {
                       >신고 및 삭제</Dropdown.Item>
                       :
                       <>
-                        <Dropdown.Item
-                          onClick={() => isAuthenticated(token) ? 
-                            openReportModal("POST", post.postId) : 
-                            (alert('로그인 후 이용해주세요.'), nav('/login'))}
-                          className='text-danger'
-                        >신고</Dropdown.Item>
+                        {
+                          loginData?.memId !== post.memId
+                          &&
+                          <Dropdown.Item
+                            onClick={() => isAuthenticated(token) ? 
+                              openReportModal("POST", post.postId) : 
+                              (alert('로그인 후 이용해주세요.'), nav('/login'))}
+                            className='text-danger'
+                          >신고</Dropdown.Item>
+                        }
                         <ReportModal
                           show={showReportModal}
                           handleClose={closeReportModal}
