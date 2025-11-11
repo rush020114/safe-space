@@ -90,13 +90,17 @@ const PostList = () => {
                       isAdmin(token)
                       ?
                       <Dropdown.Item
-                        onClick={() => isAuthenticated(token) ? null : alert('로그인 후 이용해주세요.')}
+                        onClick={() => isAuthenticated(token) ? 
+                          null : 
+                          (alert('로그인 후 이용해주세요.'), nav('/login'))}
                         className='text-danger'
                       >신고 및 삭제</Dropdown.Item>
                       :
                       <>
                         <Dropdown.Item
-                          onClick={() => isAuthenticated(token) ? openReportModal("POST", post.postId) : alert('로그인 후 이용해주세요.')}
+                          onClick={() => isAuthenticated(token) ? 
+                            openReportModal("POST", post.postId) : 
+                            (alert('로그인 후 이용해주세요.'), nav('/login'))}
                           className='text-danger'
                         >신고</Dropdown.Item>
                         <ReportModal
