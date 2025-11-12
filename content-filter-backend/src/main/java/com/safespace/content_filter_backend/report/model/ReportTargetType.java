@@ -11,7 +11,7 @@ public enum ReportTargetType {
     }
     try {
       // 대문자로 변환한 value가 POST 또는 COMMENT가 아니면 예외 발생
-      return ReportTargetType.valueOf(value.toUpperCase());
+      return ReportTargetType.valueOf(value.trim().toUpperCase());
     } catch (Exception e){
       throw new IllegalArgumentException("지원하지 않는 신고 유형입니다. : " + value);
     }

@@ -22,4 +22,7 @@ public interface PostMapper {
 
   // 게시글 상세 조회
   PostDTO getPostDetail(int postId);
+
+  // 게시글 필터링
+  void filterPost(int postId);
 }

@@ -96,4 +96,10 @@
         AND C.IS_FILTERED = 'N'
     </select>
 
+    <!-- 게시글 필터링 -->
+    <update id="filterPost">
+        UPDATE POST
+        SET IS_FILTERED = 'Y'
+        WHERE POST_ID = #{postId}
+    </update>
 </mapper>

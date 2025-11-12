@@ -16,4 +16,7 @@ public interface ReportMapper {
 
   // 관리자 신고 조회
   List<ReportDTO> getReportListForAdmin(String type);
+
+  // 관리자 신고 처리
+  void handleReport(ReportDTO reportDTO);
 }

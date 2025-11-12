@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Container, ButtonGroup, Button } from 'react-bootstrap';
 import PostReportList from './PostReportList';
+import CommentReportList from './CommentReportList';
 
 const AdminReportList = () => {
   const [activeTab, setActiveTab] = useState('POST');
@@ -35,7 +36,7 @@ const AdminReportList = () => {
       {activeTab === 'COMMENT' && (
         <div>
           <h5 className="fw-bold mb-3">💬 댓글 신고 목록</h5>
-          {/* 여기에 댓글 신고 리스트 컴포넌트 넣으면 됨 */}
+          <CommentReportList />
         </div>
       )}
     </Container>

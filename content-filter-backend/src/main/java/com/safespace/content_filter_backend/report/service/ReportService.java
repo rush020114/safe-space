@@ -1,10 +1,16 @@
 package com.safespace.content_filter_backend.report.service;
 
+import com.safespace.content_filter_backend.admin.service.SseEmitterService;
+import com.safespace.content_filter_backend.comment.mapper.CommentMapper;
+import com.safespace.content_filter_backend.member.mapper.MemberMapper;
+import com.safespace.content_filter_backend.post.mapper.PostMapper;
 import com.safespace.content_filter_backend.report.dto.ReportDTO;
 import com.safespace.content_filter_backend.report.mapper.ReportMapper;
+import com.safespace.content_filter_backend.report.model.ReportStatus;
 import com.safespace.content_filter_backend.report.model.ReportTargetType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -12,6 +18,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReportService {
   private final ReportMapper reportMapper;
+  private final MemberMapper memberMapper;
+  private final PostMapper postMapper;
+  private final CommentMapper commentMapper;
+  private final SseEmitterService sseEmitterService;
 
   // 신고 등록
   public void regReport(ReportDTO reportDTO){
@@ -36,5 +46,48 @@ public class ReportService {
     String type = ReportTargetType.from(targetType).name();
 
     return reportMapper.getReportListForAdmin(type);
+  }
+
+  // 관리자 신고 처리
+  @Transactional(rollbackFor = Exception.class)
+  public void handleReport(ReportDTO reportDTO) {
+
+    String status = ReportStatus.from(reportDTO.getReportStatus()).name();
+    String type = ReportTargetType.from(reportDTO.getTargetType()).name();
+
+    boolean isApproved = status.equals("APPROVED");
+    boolean isRejected = status.equals("REJECTED");
+    boolean isPost = type.equals("POST");
+
+    if (isApproved) {
+      // 신고 상태 처리
+      reportMapper.handleReport(reportDTO);
+
+      // 신고 대상 정보 추출
+      int targetMemId = isPost
+              ? reportDTO.getPostDTO().getMemId()
+              : reportDTO.getCommentDTO().getMemId();
+
+      int targetContentId = isPost
+              ? reportDTO.getPostDTO().getPostId()
+              : reportDTO.getCommentDTO().getCmtId();
+
+      // 회원 상태 처리
+      memberMapper.handleMemberStatus(targetMemId);
+
+      // 콘텐츠 필터링 처리
+      if (isPost) {
+        postMapper.filterPost(targetContentId);
+      } else {
+        commentMapper.filterComment(targetContentId);
+      }
+
+    } else if (isRejected) {
+      // 신고 상태 처리
+      reportMapper.handleReport(reportDTO);
+    } else {
+      throw new IllegalArgumentException("처리 가능한 신고 상태는 APPROVED 또는 REJECTED입니다. 현재 상태: " + status);
+    }
+    sseEmitterService.sendToAll(reportDTO);
   }
 }

@@ -16,7 +16,6 @@
         <result column="BANNED_UNTIL"  property="bannedUntil" />
     </resultMap>
 
-
     <!-- 로그인하려는 회원 정보 조회 -->
     <select id="getMemberForLogin" resultMap="member">
         SELECT MEM_ID
@@ -47,4 +46,14 @@
         FROM MEMBER
         WHERE MEM_EMAIL = #{memEmail}
     </select>
+    
+    <!-- 회원 상태 수정 -->
+    <update id="handleMemberStatus">
+        UPDATE MEMBER
+        SET WARNING_CNT = WARNING_CNT + 1
+            , MEM_STATUS = CASE
+                    WHEN WARNING_CNT >= 3 THEN 'BANNED'
+                    ELSE 'WARNING' END
+        WHERE MEM_ID = #{reportedId};
+    </update>
 </mapper>

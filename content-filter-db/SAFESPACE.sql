@@ -60,3 +60,25 @@ SELECT * FROM post;
 SELECT * FROM POST_IMG;
 SELECT * FROM CMT;
 SELECT * FROM report;
+
+
+SELECT r.REPORT_ID
+            , r.TARGET_TYPE
+            , r.TARGET_ID
+            , r.REPORT_REASON
+            , r.REPORT_STATUS
+            , r.CREATED_AT
+            , r.REPORTER_ID
+            , p.POST_ID
+            , p.POST_TITLE
+            , p.POST_CONTENT
+            , p.MEM_ID REPORTED_ID
+            , PIMG.ATTACHED_IMG_NAME
+        FROM REPORT r
+            INNER JOIN POST p
+            ON r.TARGET_ID = p.POST_ID
+            LEFT JOIN POST_IMG PIMG
+            ON P.POST_ID = PIMG.POST_ID
+        WHERE r.TARGET_TYPE = 'POST'
+        AND R.REPORT_STATUS = 'PENDING'
+        ORDER BY CREATED_AT

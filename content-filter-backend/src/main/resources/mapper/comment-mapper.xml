@@ -26,4 +26,10 @@
         )
     </insert>
 
+    <!-- 댓글 필터링 -->
+    <update id="filterComment">
+        UPDATE CMT
+        SET IS_FILTERED = 'Y'
+        WHERE CMT_ID = #{cmtId}
+    </update>
 </mapper>

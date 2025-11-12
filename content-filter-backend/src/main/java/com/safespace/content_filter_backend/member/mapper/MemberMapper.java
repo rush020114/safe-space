@@ -13,4 +13,7 @@ public interface MemberMapper {
 
   // 이메일 중복 조회
   int countByEmail(String memEmail);
+
+  // 회원 상태 수정
+  void handleMemberStatus(int reportedId);
 }

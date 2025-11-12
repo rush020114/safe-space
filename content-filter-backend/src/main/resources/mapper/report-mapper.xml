@@ -11,7 +11,6 @@
         <result column="REPORT_REASON"  property="reportReason" />
         <result column="REPORT_STATUS"  property="reportStatus" />
         <result column="CREATED_AT"     property="createdAt" />
-        <result column="REPORTER_ID"    property="reporterId" />
         <association property="postDTO" resultMap="com.safespace.content_filter_backend.post.mapper.PostMapper.post" />
         <association property="commentDTO" resultMap="com.safespace.content_filter_backend.comment.mapper.CommentMapper.comment" />
     </resultMap>
@@ -50,12 +49,14 @@
             , r.CREATED_AT
             , r.REPORTER_ID
         <if test="targetType != null and targetType.equals('POST')">
+            , p.POST_ID
             , p.POST_TITLE
             , p.POST_CONTENT
             , p.MEM_ID
             , PIMG.ATTACHED_IMG_NAME
         </if>
         <if test="targetType != null and targetType.equals('COMMENT')">
+            , c.CMT_ID
             , c.CMT_CONTENT
             , c.MEM_ID
         </if>
@@ -72,5 +73,13 @@
         </if>
         WHERE r.TARGET_TYPE = #{targetType}
         AND R.REPORT_STATUS = 'PENDING'
+        ORDER BY CREATED_AT
     </select>
+
+    <!-- 관리자 신고 처리 -->
+    <update id="handleReport">
+        UPDATE REPORT
+        SET REPORT_STATUS = #{reportStatus}
+        WHERE REPORT_ID = #{reportId}
+    </update>
 </mapper>

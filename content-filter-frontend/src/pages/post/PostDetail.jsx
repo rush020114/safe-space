@@ -7,11 +7,16 @@ import dayjs from 'dayjs';
 import { useSelector } from 'react-redux';
 import { isAdmin, isAuthenticated } from '../../apis/authCheck';
 import { jwtDecode } from 'jwt-decode';
+import ReportModal from '../../components/modal/ReportModal';
+import useReport from '../../hooks/useReport';
 
 const PostDetail = () => {
   const token = useSelector(state => state.auth.token);
   const {postId} = useParams();
   const loginData = token ? jwtDecode(token) : null;
+
+  // 신고처리를 위한 함수와 모달 생성 여부를 세팅할 hook
+  const {showReportModal, openReportModal, closeReportModal, submitReport} = useReport(loginData?.memId);
 
   // 댓글을 저장할 state 변수
   const [comment, setComment] = useState('');
@@ -129,10 +134,17 @@ const PostDetail = () => {
                       >신고 및 삭제</Dropdown.Item>
                       :
                       <Dropdown.Item
-                        onClick={() => isAuthenticated(token) ? null : alert('로그인 후 이용해주세요.')}
+                        onClick={() => isAuthenticated(token) ? 
+                          openReportModal("COMMENT", comment.cmtId) : 
+                          (alert('로그인 후 이용해주세요.'), nav('/login'))}
                         className='text-danger'
                       >신고</Dropdown.Item>
                     }
+                    <ReportModal
+                      show={showReportModal}
+                      handleClose={closeReportModal}
+                      handleSubmit={submitReport}
+                    />
                   </Dropdown.Menu>
                 </Dropdown>
 
