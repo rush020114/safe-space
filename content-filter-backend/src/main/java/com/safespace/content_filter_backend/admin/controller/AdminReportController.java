@@ -1,6 +1,7 @@
 package com.safespace.content_filter_backend.admin.controller;
 
 import com.safespace.content_filter_backend.admin.service.SseEmitterService;
+import com.safespace.content_filter_backend.auth.util.JwtUtil;
 import com.safespace.content_filter_backend.report.dto.ReportDTO;
 import com.safespace.content_filter_backend.report.service.ReportService;
 import lombok.RequiredArgsConstructor;
@@ -9,8 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -21,6 +20,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class AdminReportController {
   private final ReportService reportService;
   private final SseEmitterService sseEmitterService;
+  private final JwtUtil jwtUtil;
 
   // produces 값이 없으면 클라이언트가 EventSource로 연결해도 SSE로 인식되지 않음
   // 반드시 getMapping으로 요청을 보내야 함.
@@ -30,8 +30,8 @@ public class AdminReportController {
    */
   @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
   @PreAuthorize("hasRole('ADMIN')")
-  public SseEmitter streamReports(@AuthenticationPrincipal UserDetails user){
-    String adminId = user.getUsername();
+  public SseEmitter streamReports(@RequestParam String token){
+    String adminId = jwtUtil.getUsername(token);
     return sseEmitterService.createSseEmitter(adminId);
   }
 
