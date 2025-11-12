@@ -4,5 +4,13 @@
 <!-- 해당 파일에 모든 쿼리문을 작성 -->
 <!-- namespace에는 xml파일과 연결할 Mapper interface 파일명을 패키지를 포함하여 적어주세요 -->
 <mapper namespace="com.safespace.content_filter_backend.sanction.mapper.SanctionMapper">
-
+    <resultMap id="sanction" type="com.safespace.content_filter_backend.sanction.dto.SanctionDTO">
+        <id     column="SANCTION_ID"      property="sanctionId" />
+        <result column="SANCTION_TYPE"    property="sanctionType" />
+        <result column="SANCTION_REASON"  property="sanctionReason" />
+        <result column="START_DATE"       property="startDate" />
+        <result column="END_DATE"         property="endDate" />
+        <result column="MEM_ID"           property="memId" />
+        <result column="ADMIN_ID"         property="adminId" />
+    </resultMap>
 </mapper>
