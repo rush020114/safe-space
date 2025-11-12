@@ -46,9 +46,11 @@ public class SseEmitterService {
 
     // 연결 확인용 더미 데이터
     try {
+      log.info("SSE 연결 확인용 더미 이벤트 전송 시작: {}", adminId);
       emitter.send(SseEmitter.event()
               .name("connect")
               .data("SSE 연결 성공"));
+      log.info("SSE 연결 확인용 더미 이벤트 전송 완료: {}", adminId);
     } catch (IOException e) {
       log.error("SSE 연결 실패: {}", adminId, e);
       emitters.remove(adminId);
@@ -63,6 +65,7 @@ public class SseEmitterService {
    */
   public void sendToAll(Object data){
     emitters.forEach((adminId, emitter) -> {
+      log.info("SSE 알림 전송 대상 emitter 수: {}", emitters.size());
       try {
         emitter.send(SseEmitter.event()
                 .name("newReport")

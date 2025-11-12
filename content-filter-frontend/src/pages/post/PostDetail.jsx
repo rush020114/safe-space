@@ -15,6 +15,9 @@ const PostDetail = () => {
   const {postId} = useParams();
   const loginData = token ? jwtDecode(token) : null;
 
+  // 리렌더링용 state 변수
+  const [reload, setReload] = useState(0);
+
   // 신고처리를 위한 함수와 모달 생성 여부를 세팅할 hook
   const {showReportModal, openReportModal, closeReportModal, submitReport} = useReport(loginData?.memId);
 
@@ -29,7 +32,7 @@ const PostDetail = () => {
     axiosInstance.get(`${SERVER_URL}/posts/${postId}`)
     .then(res => setPostDetail(res.data))
     .catch(e => console.log(e));
-  }, []);
+  }, [reload]);
   
   // 댓글을 등록할 함수
   const regComment = () => {
@@ -37,7 +40,11 @@ const PostDetail = () => {
       cmtContent: comment
       , postId
     })
-    .then(res => alert(res.data))
+    .then(res => {
+      alert(res.data);
+      setReload(prev => prev + 1);
+      setComment('');
+    })
     .catch(e => {
       if (e.status === 403){
         alert('로그인이 필요한 서비스입니다.')

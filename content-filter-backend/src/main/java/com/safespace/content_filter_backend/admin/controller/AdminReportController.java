@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -30,8 +32,8 @@ public class AdminReportController {
    */
   @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
   @PreAuthorize("hasRole('ADMIN')")
-  public SseEmitter streamReports(@RequestParam String token){
-    String adminId = jwtUtil.getUsername(token);
+  public SseEmitter streamReports(@AuthenticationPrincipal UserDetails user){
+    String adminId = user.getUsername();
     return sseEmitterService.createSseEmitter(adminId);
   }
 

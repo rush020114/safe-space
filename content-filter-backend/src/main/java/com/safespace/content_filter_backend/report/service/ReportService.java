@@ -9,11 +9,13 @@ import com.safespace.content_filter_backend.report.mapper.ReportMapper;
 import com.safespace.content_filter_backend.report.model.ReportStatus;
 import com.safespace.content_filter_backend.report.model.ReportTargetType;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ReportService {
@@ -37,6 +39,8 @@ public class ReportService {
       throw new RuntimeException("신고 사유를 선택해주십시오");
 
     reportMapper.regReport(reportDTO);
+    log.info("SSE 알림 전송 시작: {}", reportDTO);
+    sseEmitterService.sendToAll(reportDTO);
   }
 
   // 관리자 신고 조회
@@ -88,6 +92,5 @@ public class ReportService {
     } else {
       throw new IllegalArgumentException("처리 가능한 신고 상태는 APPROVED 또는 REJECTED입니다. 현재 상태: " + status);
     }
-    sseEmitterService.sendToAll(reportDTO);
   }
 }

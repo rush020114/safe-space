@@ -31,14 +31,14 @@ public class CommentController {
       commentService.regComment(commentDTO);
       return ResponseEntity
               .status(HttpStatus.CREATED)
-              .body("게시글 등록 성공");
+              .body("댓글 등록 성공");
     } catch (RuntimeException e){
       log.info("댓글 등록 실패 - 입력 오류 : {}", e.getMessage());
       return ResponseEntity
               .status(HttpStatus.BAD_REQUEST)
               .body(e.getMessage());
     } catch (Exception e){
-      log.info("게시글 등록 실패 - 서버 오류", e);
+      log.info("댓글 등록 실패 - 서버 오류", e);
       return ResponseEntity
               .status(HttpStatus.INTERNAL_SERVER_ERROR)
               .body(e.getMessage());

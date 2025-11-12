@@ -34,7 +34,8 @@ const AdminReportList = () => {
   useAdminSSE({
     token,
     onReport: newReport => {
-      alert(`새로운 신고가 접수되었습니다!\n내용: ${newReport.reportContent}`);
+      console.log(newReport)
+      alert(`새로운 신고가 접수되었습니다!\n내용: ${newReport.reportReason}`);
       if (newReport.reportTarget === 'POST') {
         setPostReportList(prev => [newReport, ...prev]);
       } else if (newReport.reportTarget === 'COMMENT') {

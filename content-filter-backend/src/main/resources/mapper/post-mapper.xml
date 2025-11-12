@@ -79,7 +79,7 @@
             , POST_TITLE
             , POST_CONTENT
             , p.CREATED_AT
-            , p.MEM_ID
+            , c.MEM_ID
             , IMG_NUM
             , ATTACHED_IMG_NAME
             , CMT_ID
