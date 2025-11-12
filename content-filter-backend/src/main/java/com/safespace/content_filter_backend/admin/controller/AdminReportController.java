@@ -4,10 +4,14 @@ import com.safespace.content_filter_backend.admin.service.SseEmitterService;
 import com.safespace.content_filter_backend.report.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -27,9 +31,32 @@ public class AdminReportController {
    * GET /admin/reports/stream
    */
   @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+  @PreAuthorize("hasRole(ADMIN)")
   public SseEmitter streamReports(@AuthenticationPrincipal UserDetails user){
     String adminId = user.getUsername();
     return sseEmitterService.createSseEmitter(adminId);
+  }
+
+  // 신고 목록 조회
+  // targetType(POST/COMMENT)에 따라 조인 테이블과 SELECT 컬럼을 동적으로 분기함(신고 유형 확장성 고려)
+  @GetMapping("/{targetType}")
+  @PreAuthorize("hasRole(ADMIN)")
+  public ResponseEntity<?> getReportListForAdmin(@PathVariable("targetType") String targetType){
+    try {
+      return ResponseEntity
+              .status(HttpStatus.OK)
+              .body(reportService.getReportListForAdmin(targetType));
+    } catch (IllegalArgumentException e) {
+      log.info("신고 목록 조회 실패 - 타입 불일치 : {}", e.getMessage());
+      return ResponseEntity
+              .status(HttpStatus.BAD_REQUEST)
+              .body(e.getMessage());
+    } catch (Exception e) {
+      log.info("신고 목록 조회 실패 - 서버 오류", e);
+      return ResponseEntity
+              .status(HttpStatus.INTERNAL_SERVER_ERROR)
+              .body("신고 목록 조회 중 서버 오류 발생");
+    }
   }
 
 

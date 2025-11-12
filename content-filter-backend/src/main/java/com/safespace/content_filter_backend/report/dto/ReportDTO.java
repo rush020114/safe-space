@@ -1,5 +1,7 @@
 package com.safespace.content_filter_backend.report.dto;
 
+import com.safespace.content_filter_backend.comment.dto.CommentDTO;
+import com.safespace.content_filter_backend.post.dto.PostDTO;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -17,6 +19,9 @@ public class ReportDTO {
   private String reportStatus;    // 신고 상태
   private LocalDateTime createdAt; // 신고일
   private int reporterId;         // 신고자 ID
+
+  private PostDTO postDTO;
+  private CommentDTO commentDTO;
 
   public ReportDTO() {
   }

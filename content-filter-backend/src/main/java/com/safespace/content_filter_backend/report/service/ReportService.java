@@ -2,8 +2,11 @@ package com.safespace.content_filter_backend.report.service;
 
 import com.safespace.content_filter_backend.report.dto.ReportDTO;
 import com.safespace.content_filter_backend.report.mapper.ReportMapper;
+import com.safespace.content_filter_backend.report.model.ReportTargetType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -27,9 +30,11 @@ public class ReportService {
   }
 
   // 관리자 신고 조회
-  public void getReportListForAdmin(String targetType){
-    if(targetType == null || (!targetType.equals("POST") && !targetType.equals("COMMENT"))){
+  public List<ReportDTO> getReportListForAdmin(String targetType){
 
-    }
+    // 게시글 유형 파악 메서드
+    String type = ReportTargetType.from(targetType).name();
+
+    return reportMapper.getReportListForAdmin(type);
   }
 }

@@ -49,12 +49,28 @@
             , r.REPORT_STATUS
             , r.CREATED_AT
             , r.REPORTER_ID
+        <if test="targetType != null and targetType.equals('POST')">
             , p.POST_TITLE
             , p.POST_CONTENT
             , p.MEM_ID
+            , PIMG.ATTACHED_IMG_NAME
+        </if>
+        <if test="targetType != null and targetType.equals('COMMENT')">
+            , c.CMT_CONTENT
+            , c.MEM_ID
+        </if>
         FROM REPORT r
-        JOIN POST p
-        ON r.TARGET_ID = p.POST_ID
-        WHERE r.TARGET_TYPE = #{targetType};
+        <if test="targetType != null and targetType.equals('POST')">
+            INNER JOIN POST p
+            ON r.TARGET_ID = p.POST_ID
+            LEFT JOIN POST_IMG PIMG
+            ON P.POST_ID = PIMG.POST_ID
+        </if>
+        <if test="targetType != null and targetType.equals('COMMENT')">
+            INNER JOIN CMT c
+            ON r.TARGET_ID = c.CMT_ID
+        </if>
+        WHERE r.TARGET_TYPE = #{targetType}
+        AND R.REPORT_STATUS = 'PENDING'
     </select>
 </mapper>

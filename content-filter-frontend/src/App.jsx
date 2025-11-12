@@ -12,6 +12,7 @@ import Join from './pages/auth/Join'
 import Post from './pages/post/Post'
 import PostList from './pages/post/PostList'
 import PostDetail from './pages/post/PostDetail'
+import AdminReportList from './pages/admin/report/AdminReportList'
 
 const App = () => {
 
@@ -25,7 +26,9 @@ const App = () => {
           <Route path='/post' element={<ProtectedRoute><Post /></ProtectedRoute>} />
           <Route path='/post-detail/:postId' element={<PostDetail />} />
           <Route path='/user' element={<ProtectedRoute><div>유저</div></ProtectedRoute>} />
-          <Route path='/admin' element={<ProtectedAdminRoute><div>관리자</div></ProtectedAdminRoute>} />
+        </Route>
+        <Route path='/admin' element={<Layout />}>
+          <Route path='' element={<ProtectedAdminRoute><AdminReportList /></ProtectedAdminRoute>} />
         </Route>
       </Routes>
     </>

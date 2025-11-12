@@ -1,7 +1,10 @@
 package com.safespace.content_filter_backend.report.mapper;
 
 import com.safespace.content_filter_backend.report.dto.ReportDTO;
+import com.safespace.content_filter_backend.report.model.ReportTargetType;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
 
 @Mapper
 public interface ReportMapper {
@@ -12,5 +15,5 @@ public interface ReportMapper {
   int getDupReport(ReportDTO reportDTO);
 
   // 관리자 신고 조회
-  void getReportListForAdmin(String targetType);
+  List<ReportDTO> getReportListForAdmin(String type);
 }
