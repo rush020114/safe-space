@@ -15,11 +15,13 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class RedisService {
   // Redis랑 통신할 때 쓰는 도구 (Spring에서 제공)
+  // 설정 파일로 인해 Redis서버와 연결, key와 value가 문자열로 저장될 수 있게 됨.
   private final RedisTemplate<String, String> redisTemplate;
   private final MemberMapper memberMapper;
 
   // Redis에서 회원 상태 조회 후 캐싱(캐싱 : Redis에 DB에서 조회한 데이터를 저장 - 앞으로 빠르게 찾기 위해)
   public String getMemberStatus(int memId) {
+    // 캐시에서 값 꺼내오기
     String key = "member:" + memId + ":status";
     String cachedStatus = redisTemplate.opsForValue().get(key);
 
