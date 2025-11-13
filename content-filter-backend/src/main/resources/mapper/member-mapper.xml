@@ -47,14 +47,21 @@
         WHERE MEM_EMAIL = #{memEmail}
     </select>
     
-    <!-- 회원 상태 수정 -->
-    <update id="handleMemberStatus">
+    <!-- 회원 경고 횟수 증가 -->
+    <update id="addWarningCnt">
         UPDATE MEMBER
         SET WARNING_CNT = WARNING_CNT + 1
-            , MEM_STATUS = CASE
-                    WHEN WARNING_CNT >= 3 THEN 'BANNED'
-                    ELSE 'WARNING' END
         WHERE MEM_ID = #{reportedId};
+    </update>
+
+    <!-- 회원 제재 -->
+    <update id="banMember">
+        UPDATE MEMBER
+        SET MEM_STATUS = CASE
+            WHEN MOD(WARNING_CNT, 3) = 0 THEN 'BANNED'
+            ELSE 'WARNING' END
+        , BANNED_UNTIL = #{bannedUntil}
+        WHERE MEM_ID = #{reportedId}
     </update>
 
     <!-- 회원 제재를 위한 조회(redis) -->

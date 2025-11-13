@@ -3,6 +3,7 @@ package com.safespace.content_filter_backend.config;
 import com.safespace.content_filter_backend.auth.filter.JwtConfirmFilter;
 import com.safespace.content_filter_backend.auth.filter.LoginFilter;
 import com.safespace.content_filter_backend.auth.util.JwtUtil;
+import com.safespace.content_filter_backend.infra.redis.RedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,6 +32,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class SecurityConfig {
   private final JwtUtil jwtUtil;
+  private final RedisService redisService;
   // spring security에서 http 요청에 대한 보안 설정을 정의하는 메서드
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity httpSecurity, AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -66,7 +68,7 @@ public class SecurityConfig {
     httpSecurity.addFilterAt(new LoginFilter(authenticationManager, jwtUtil), UsernamePasswordAuthenticationFilter.class);
     // JWT 토큰 존재 여부 및 유효성 검사를 위한 필터 추가
     // LoginFilter보다 먼저 실행되도록 필터 체인에 등록
-    httpSecurity.addFilterBefore(new JwtConfirmFilter(jwtUtil), LoginFilter.class);
+    httpSecurity.addFilterBefore(new JwtConfirmFilter(jwtUtil, redisService), LoginFilter.class);
 
     return httpSecurity.build();
   }

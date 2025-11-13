@@ -13,4 +13,23 @@
         <result column="MEM_ID"           property="memId" />
         <result column="ADMIN_ID"         property="adminId" />
     </resultMap>
+
+    <!-- 제재 등록 -->
+    <insert id="regSanction">
+        INSERT INTO SANCTION (
+            SANCTION_TYPE
+            , SANCTION_REASON
+            , START_DATE
+            , END_DATE
+            , MEM_ID
+            , ADMIN_ID
+        ) VALUES (
+            #{sanctionType}
+            , #{sanctionReason}
+            , CURRENT_TIMESTAMP
+            , #{endDate}
+            , #{memId}
+            , #{adminId}
+        )
+    </insert>
 </mapper>

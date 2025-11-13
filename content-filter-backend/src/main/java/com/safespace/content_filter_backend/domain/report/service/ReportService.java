@@ -8,11 +8,14 @@ import com.safespace.content_filter_backend.domain.report.dto.ReportDTO;
 import com.safespace.content_filter_backend.domain.report.mapper.ReportMapper;
 import com.safespace.content_filter_backend.domain.report.model.ReportStatus;
 import com.safespace.content_filter_backend.domain.report.model.ReportTargetType;
+import com.safespace.content_filter_backend.domain.sanction.dto.SanctionDTO;
+import com.safespace.content_filter_backend.domain.sanction.mapper.SanctionMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -23,6 +26,7 @@ public class ReportService {
   private final MemberMapper memberMapper;
   private final PostMapper postMapper;
   private final CommentMapper commentMapper;
+  private final SanctionMapper sanctionMapper;
   private final SseEmitterService sseEmitterService;
 
   // 신고 등록
@@ -54,7 +58,7 @@ public class ReportService {
 
   // 관리자 신고 처리
   @Transactional(rollbackFor = Exception.class)
-  public void handleReport(ReportDTO reportDTO) {
+  public void handleReport(ReportDTO reportDTO, int adminId) {
 
     String status = ReportStatus.from(reportDTO.getReportStatus()).name();
     String type = ReportTargetType.from(reportDTO.getTargetType()).name();
@@ -77,7 +81,7 @@ public class ReportService {
               : reportDTO.getCommentDTO().getCmtId();
 
       // 회원 상태 처리
-      memberMapper.handleMemberStatus(targetMemId);
+      memberMapper.addWarningCnt(targetMemId);
 
       // 콘텐츠 필터링 처리
       if (isPost) {
@@ -86,6 +90,37 @@ public class ReportService {
         commentMapper.filterComment(targetContentId);
       }
 
+      // 회원 신고된 횟수 조회
+      int warningCnt = memberMapper.getMemberStatusById(targetMemId).getWarningCnt();
+      SanctionDTO sanctionDTO = new SanctionDTO();
+      if(warningCnt == 9) {
+        sanctionDTO.setSanctionType("BAN_PERMANENT");
+        sanctionDTO.setSanctionReason("신고 9회 누적으로 영구 정지");
+        sanctionDTO.setMemId(targetMemId);
+        sanctionDTO.setAdminId(adminId);
+        sanctionMapper.regSanction(sanctionDTO);
+        memberMapper.banMember(LocalDateTime.of(9999, 12, 31, 23, 59), targetMemId);
+      } else if (warningCnt == 6) {
+        LocalDateTime bannedUntil = LocalDateTime.now().plusMinutes(3);
+        sanctionDTO.setSanctionType("BAN_TEMP_2");
+        sanctionDTO.setSanctionReason("신고 6회 누적으로 " + bannedUntil + "까지 정지");
+        sanctionDTO.setEndDate(bannedUntil);
+        sanctionDTO.setMemId(targetMemId);
+        sanctionDTO.setAdminId(adminId);
+        sanctionMapper.regSanction(sanctionDTO);
+        memberMapper.banMember(bannedUntil, targetMemId);
+      } else if (warningCnt == 3) {
+        sanctionDTO.setSanctionType("BAN_TEMP_1");
+        LocalDateTime bannedUntil = LocalDateTime.now().plusMinutes(1);
+        sanctionDTO.setSanctionReason("신고 3회 누적으로 " + bannedUntil + "까지 정지");
+        sanctionDTO.setEndDate(bannedUntil);
+        sanctionDTO.setMemId(targetMemId);
+        sanctionDTO.setAdminId(adminId);
+        sanctionMapper.regSanction(sanctionDTO);
+        memberMapper.banMember(bannedUntil, targetMemId);
+      } else {
+        throw new IllegalArgumentException("신고 횟수가 정확하지 않습니다.");
+      }
     } else if (isRejected) {
       // 신고 상태 처리
       reportMapper.handleReport(reportDTO);

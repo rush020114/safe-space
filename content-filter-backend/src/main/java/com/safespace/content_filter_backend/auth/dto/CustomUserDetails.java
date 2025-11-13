@@ -42,6 +42,10 @@ public class CustomUserDetails implements UserDetails {
     return memberDTO.getMemEmail();
   }
 
+  public int getUserId(){
+    return memberDTO.getMemId();
+  }
+
   @Override // 만료되지 않은 계정인가?
   public boolean isAccountNonExpired() {
     return true;

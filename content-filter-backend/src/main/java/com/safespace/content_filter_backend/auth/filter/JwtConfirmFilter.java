@@ -3,6 +3,7 @@ package com.safespace.content_filter_backend.auth.filter;
 import com.safespace.content_filter_backend.auth.dto.CustomUserDetails;
 import com.safespace.content_filter_backend.auth.util.JwtUtil;
 import com.safespace.content_filter_backend.domain.member.dto.MemberDTO;
+import com.safespace.content_filter_backend.infra.redis.RedisService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +24,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtConfirmFilter extends OncePerRequestFilter {
   private final JwtUtil jwtUtil;
+  private final RedisService redisService;
 
   @Override
   protected void doFilterInternal (HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -51,15 +53,23 @@ public class JwtConfirmFilter extends OncePerRequestFilter {
       // 3. 토큰 있고 유효하면 인증 정보 주입
       if (token != null && !jwtUtil.isExpired(token)) {
         log.info("토큰이 정상적으로 검증되었습니다.");
+
+        int memId = jwtUtil.getMemIdFromToken(token);
+
+        // Redis에서 제재 상태 확인
+        String memStatus = redisService.getMemberStatus(memId);
+
         // 토큰에서 username과 role 획득
         String username = jwtUtil.getUsername(token);
         String role = jwtUtil.getRole(token);
+        int userId = jwtUtil.getMemIdFromToken(token);
 
         // userEntity를 생성하여 값 set
         MemberDTO memberDTO = new MemberDTO();
 
         memberDTO.setMemEmail(username);
         memberDTO.setMemRole(role);
+        memberDTO.setMemId(userId);
 
         // userDetail에 회원 정보 객체 담기
         CustomUserDetails customUserDetails = new CustomUserDetails(memberDTO);

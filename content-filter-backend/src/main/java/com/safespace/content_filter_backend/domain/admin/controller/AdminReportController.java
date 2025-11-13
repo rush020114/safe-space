@@ -1,5 +1,6 @@
 package com.safespace.content_filter_backend.domain.admin.controller;
 
+import com.safespace.content_filter_backend.auth.dto.CustomUserDetails;
 import com.safespace.content_filter_backend.domain.admin.service.SseEmitterService;
 import com.safespace.content_filter_backend.auth.util.JwtUtil;
 import com.safespace.content_filter_backend.domain.report.dto.ReportDTO;
@@ -63,12 +64,14 @@ public class AdminReportController {
   @PutMapping("/{reportId}")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<?> handleReport(
-          @PathVariable int reportId,
-          @RequestBody ReportDTO reportDTO
-  ) {
+          @PathVariable int reportId
+          , @RequestBody ReportDTO reportDTO
+          , @AuthenticationPrincipal CustomUserDetails user
+          ) {
     try {
+      int adminId = user.getUserId();
       reportDTO.setReportId(reportId);
-      reportService.handleReport(reportDTO);
+      reportService.handleReport(reportDTO, adminId);
       return ResponseEntity
               .status(HttpStatus.OK)
               .body("신고 처리 완료" + reportDTO.getReportStatus());
