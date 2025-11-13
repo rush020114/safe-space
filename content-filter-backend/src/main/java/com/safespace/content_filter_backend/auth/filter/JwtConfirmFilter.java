@@ -3,6 +3,7 @@ package com.safespace.content_filter_backend.auth.filter;
 import com.safespace.content_filter_backend.auth.dto.CustomUserDetails;
 import com.safespace.content_filter_backend.auth.util.JwtUtil;
 import com.safespace.content_filter_backend.domain.member.dto.MemberDTO;
+import com.safespace.content_filter_backend.domain.sanction.dto.SanctionDTO;
 import com.safespace.content_filter_backend.infra.redis.RedisService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -54,20 +55,38 @@ public class JwtConfirmFilter extends OncePerRequestFilter {
       if (token != null && !jwtUtil.isExpired(token)) {
         log.info("토큰이 정상적으로 검증되었습니다.");
 
+        // 토큰에서 username과 role, ID 획득
+        String username = jwtUtil.getUsername(token);
+        String role = jwtUtil.getRole(token);
         int memId = jwtUtil.getMemIdFromToken(token);
 
         // Redis에서 제재 상태 확인
-        String memStatus = redisService.getMemberStatus(memId);
-        if("BANNED".equals(memStatus)){
-          log.warn("제재된 사용자 접근 차단 : memId {}", memId);
-          response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-          response.getWriter().write("계정이 정지되었습니다.");
-          return;
-        }
+        MemberDTO memberInfo = redisService.getMemberSanctionInfo(memId);
+        if("BANNED".equals(memberInfo.getMemStatus())){
+          SanctionDTO sanctionDTO = memberInfo.getSanctionDTO();
 
-        // 토큰에서 username과 role 획득
-        String username = jwtUtil.getUsername(token);
-        String role = jwtUtil.getRole(token);
+          if(sanctionDTO != null) {
+            String sanctionReason = sanctionDTO.getSanctionReason();
+            log.warn("제재된 사용자 접근 차단: memId={}, reason={}", memId, sanctionReason);
+
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.setContentType("application/json;charset=UTF-8");
+
+            String errorMessage = String.format(
+                    "{\"error\":\"계정이 정지되었습니다\",\"reason\":\"%s\"}",
+                    sanctionReason
+            );
+
+            response.getWriter().write(errorMessage);
+            return;
+          } else {
+            log.error("BANNED 상태인데 제재 정보 없음: memId={}", memId);
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.setContentType("application/json;charset=UTF-8");
+            response.getWriter().write("{\"error\":\"계정이 정지되었습니다\"}");
+            return;
+          }
+        }
 
         // userEntity를 생성하여 값 set
         MemberDTO memberDTO = new MemberDTO();

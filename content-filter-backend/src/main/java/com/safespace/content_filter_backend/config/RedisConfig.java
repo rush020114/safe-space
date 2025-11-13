@@ -34,13 +34,15 @@ public class RedisConfig {
 
   // Redis에 데이터를 넣고 꺼낼 수 있는 도구(RedisTemplate)를 Spring에 등록해주는 역할
   @Bean
-  public RedisTemplate<String, String> redisTemplate(){
-    RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
+  public RedisTemplate<String, Object> redisTemplate(){
+    RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
     // Redis에 데이터를 넣고 꺼낼 수 있는 도구에 서버 연결 설정을 포함
     redisTemplate.setConnectionFactory(redisConnectionFactory());
     // Redis에 저장할 때 key/value를 어떻게 변환할지 지정
     redisTemplate.setKeySerializer(new StringRedisSerializer());
     redisTemplate.setValueSerializer(new StringRedisSerializer());
+    redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+    redisTemplate.setHashValueSerializer(new StringRedisSerializer());
     return redisTemplate;
   }
 }

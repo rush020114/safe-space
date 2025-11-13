@@ -2,8 +2,10 @@ package com.safespace.content_filter_backend.domain.member.mapper;
 
 import com.safespace.content_filter_backend.domain.member.dto.MemberDTO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Mapper
 public interface MemberMapper {
@@ -24,4 +26,10 @@ public interface MemberMapper {
 
   // 회원 제재를 위한 조회
   MemberDTO getMemberStatusById(int memId);
+
+  // 정지 해제 대상 조회 (BANNED이고 bannedUntil이 현재 시간 이전)
+  List<MemberDTO> getExpiredBannedMembers(@Param("now") LocalDateTime now);
+
+  // 회원 상태 업데이트
+  void updateMemberStatus(@Param("memId") int memId, @Param("status") String status);
 }

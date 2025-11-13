@@ -67,7 +67,8 @@
 
     <!-- 회원 제재를 위한 조회(redis) -->
     <select id="getMemberStatusById" resultMap="member">
-        SELECT M.BANNED_UNTIL
+        SELECT M.MEMBER_STATUS
+            , M.BANNED_UNTIL
             , M.WARNING_CNT
             , S.SANCTION_REASON
             , S.SANCTION_TYPE
@@ -87,4 +88,23 @@
         ) S ON M.MEM_ID = S.MEM_ID
         WHERE M.MEM_ID = #{memId}
     </select>
+
+    <!-- 정지 해제 대상 조회 -->
+    <select id="getExpiredBannedMembers" resultMap="member">
+        SELECT MEM_ID
+        , MEM_STATUS
+        , BANNED_UNTIL
+        FROM MEMBER
+        WHERE MEM_STATUS = 'BANNED'
+        AND BANNED_UNTIL IS NOT NULL
+        AND BANNED_UNTIL &lt;= #{now}
+    </select>
+
+    <!-- 회원 상태 업데이트 (정지 해제용) -->
+    <update id="updateMemberStatus">
+        UPDATE MEMBER
+        SET MEM_STATUS = #{status}
+            , BANNED_UNTIL = NULL
+        WHERE MEM_ID = #{memId}
+    </update>
 </mapper>

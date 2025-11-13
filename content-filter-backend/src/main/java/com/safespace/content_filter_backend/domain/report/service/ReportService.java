@@ -2,6 +2,7 @@ package com.safespace.content_filter_backend.domain.report.service;
 
 import com.safespace.content_filter_backend.domain.admin.service.SseEmitterService;
 import com.safespace.content_filter_backend.domain.comment.mapper.CommentMapper;
+import com.safespace.content_filter_backend.domain.member.dto.MemberDTO;
 import com.safespace.content_filter_backend.domain.member.mapper.MemberMapper;
 import com.safespace.content_filter_backend.domain.post.mapper.PostMapper;
 import com.safespace.content_filter_backend.domain.report.dto.ReportDTO;
@@ -10,6 +11,7 @@ import com.safespace.content_filter_backend.domain.report.model.ReportStatus;
 import com.safespace.content_filter_backend.domain.report.model.ReportTargetType;
 import com.safespace.content_filter_backend.domain.sanction.dto.SanctionDTO;
 import com.safespace.content_filter_backend.domain.sanction.mapper.SanctionMapper;
+import com.safespace.content_filter_backend.infra.redis.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,7 @@ public class ReportService {
   private final CommentMapper commentMapper;
   private final SanctionMapper sanctionMapper;
   private final SseEmitterService sseEmitterService;
+  private final RedisService redisService;
 
   // 신고 등록
   public void regReport(ReportDTO reportDTO){
@@ -93,38 +96,68 @@ public class ReportService {
       // 회원 신고된 횟수 조회
       int warningCnt = memberMapper.getMemberStatusById(targetMemId).getWarningCnt();
       SanctionDTO sanctionDTO = new SanctionDTO();
-      if(warningCnt == 9) {
-        sanctionDTO.setSanctionType("BAN_PERMANENT");
-        sanctionDTO.setSanctionReason("신고 9회 누적으로 영구 정지");
+      LocalDateTime bannedUntil = null;
+      String sanctionType = null;
+      String sanctionReason = null;
+
+      if (warningCnt == 9) {
+        bannedUntil = LocalDateTime.of(9999, 12, 31, 23, 59);
+        sanctionType = "BAN_PERMANENT";
+        sanctionReason = "신고 9회 누적으로 영구 정지";
+
+        sanctionDTO.setSanctionType(sanctionType);
+        sanctionDTO.setSanctionReason(sanctionReason);
         sanctionDTO.setMemId(targetMemId);
         sanctionDTO.setAdminId(adminId);
         sanctionMapper.regSanction(sanctionDTO);
-        memberMapper.banMember(LocalDateTime.of(9999, 12, 31, 23, 59), targetMemId);
+        memberMapper.banMember(bannedUntil, targetMemId);
+
+        // Redis 업데이트
+        redisService.updateMemberStatus(targetMemId, "BANNED", bannedUntil, sanctionType, sanctionReason);
+
       } else if (warningCnt == 6) {
-        LocalDateTime bannedUntil = LocalDateTime.now().plusMinutes(3);
-        sanctionDTO.setSanctionType("BAN_TEMP_2");
-        sanctionDTO.setSanctionReason("신고 6회 누적으로 " + bannedUntil + "까지 정지");
+        bannedUntil = LocalDateTime.now().plusMinutes(3);
+        sanctionType = "BAN_TEMP_2";
+        sanctionReason = "신고 6회 누적으로 " + bannedUntil + "까지 정지";
+
+        sanctionDTO.setSanctionType(sanctionType);
+        sanctionDTO.setSanctionReason(sanctionReason);
         sanctionDTO.setEndDate(bannedUntil);
         sanctionDTO.setMemId(targetMemId);
         sanctionDTO.setAdminId(adminId);
         sanctionMapper.regSanction(sanctionDTO);
         memberMapper.banMember(bannedUntil, targetMemId);
+
+        // Redis 업데이트
+        redisService.updateMemberStatus(targetMemId, "BANNED", bannedUntil, sanctionType, sanctionReason);
+
       } else if (warningCnt == 3) {
-        sanctionDTO.setSanctionType("BAN_TEMP_1");
-        LocalDateTime bannedUntil = LocalDateTime.now().plusMinutes(1);
-        sanctionDTO.setSanctionReason("신고 3회 누적으로 " + bannedUntil + "까지 정지");
+        bannedUntil = LocalDateTime.now().plusMinutes(1);
+        sanctionType = "BAN_TEMP_1";
+        sanctionReason = "신고 3회 누적으로 " + bannedUntil + "까지 정지";
+
+        sanctionDTO.setSanctionType(sanctionType);
+        sanctionDTO.setSanctionReason(sanctionReason);
         sanctionDTO.setEndDate(bannedUntil);
         sanctionDTO.setMemId(targetMemId);
         sanctionDTO.setAdminId(adminId);
         sanctionMapper.regSanction(sanctionDTO);
         memberMapper.banMember(bannedUntil, targetMemId);
+
+        // Redis 업데이트
+        redisService.updateMemberStatus(targetMemId, "BANNED", bannedUntil, sanctionType, sanctionReason);
+
       } else {
-        // ✅ throw 제거하고 로그만
         log.info("경고 {}회 - 제재 없음 (콘텐츠 필터링만)", warningCnt);
+
+        // Redis 경고 횟수 업데이트
+        MemberDTO updated = memberMapper.getMemberStatusById(targetMemId);
+        redisService.cacheMemberSanctionInfo(targetMemId, updated);
       }
     } else if (isRejected) {
       // 신고 상태 처리
       reportMapper.handleReport(reportDTO);
+
     } else {
       throw new IllegalArgumentException("처리 가능한 신고 상태는 APPROVED 또는 REJECTED입니다. 현재 상태: " + status);
     }
