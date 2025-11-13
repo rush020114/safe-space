@@ -22,6 +22,6 @@ public interface MemberMapper {
   // 회원 제재
   void banMember(LocalDateTime bannedUntil, int reportedId);
 
-  // 회원 제재를 위한 조회(redis)
+  // 회원 제재를 위한 조회
   MemberDTO getMemberStatusById(int memId);
 }

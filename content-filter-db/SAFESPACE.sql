@@ -8,7 +8,7 @@ CREATE TABLE MEMBER(
    , CREATED_AT TIMESTAMP DEFAULT CURRENT_TIMESTAMP  # 생성일
    , MEM_STATUS VARCHAR(10) DEFAULT 'ACTIVE' # 이용자 상태 (ACTIVE, WARNING, BANNED)
    , WARNING_CNT INT DEFAULT 0               # 경고 횟수
-   , BANNED_UNTIL TIMESTAMP                  # 정지일     
+   , BANNED_UNTIL TIMESTAMP                  # 정지 만료일     
 );
 
 # 게시글
@@ -73,5 +73,24 @@ SELECT * FROM post;
 SELECT * FROM POST_IMG;
 SELECT * FROM CMT;
 SELECT * FROM report;
+SELECT * FROM sanction;
 
-
+SELECT M.BANNED_UNTIL,
+       S.SANCTION_REASON,
+       S.SANCTION_TYPE,
+       M.WARNING_CNT
+FROM MEMBER M
+LEFT JOIN (
+    SELECT SANCTION_REASON,
+           SANCTION_TYPE,
+           MEM_ID
+    FROM (
+        SELECT SANCTION_REASON,
+               SANCTION_TYPE,
+               MEM_ID,
+               ROW_NUMBER() OVER (PARTITION BY MEM_ID ORDER BY START_DATE DESC) AS rn
+        FROM SANCTION
+    ) T
+    WHERE T.rn = 1
+) S ON M.MEM_ID = S.MEM_ID
+WHERE M.MEM_ID = 2;

@@ -14,6 +14,7 @@
         <result column="MEM_STATUS"    property="memStatus" />
         <result column="WARNING_CNT"   property="warningCnt" />
         <result column="BANNED_UNTIL"  property="bannedUntil" />
+        <association property="sanctionDTO" resultMap="com.safespace.content_filter_backend.domain.sanction.mapper.SanctionMapper.sanction" />
     </resultMap>
 
     <!-- 로그인하려는 회원 정보 조회 -->
@@ -66,10 +67,24 @@
 
     <!-- 회원 제재를 위한 조회(redis) -->
     <select id="getMemberStatusById" resultMap="member">
-        SELECT MEM_STATUS
-            , WARNING_CNT
-            , BANNED_UNTIL
-        FROM MEMBER
-        WHERE MEM_ID = #{memId}
+        SELECT M.BANNED_UNTIL
+            , M.WARNING_CNT
+            , S.SANCTION_REASON
+            , S.SANCTION_TYPE
+        FROM MEMBER M
+        LEFT JOIN (
+            SELECT SANCTION_REASON
+                , SANCTION_TYPE
+                , MEM_ID
+            FROM (
+                SELECT SANCTION_REASON
+                    , SANCTION_TYPE
+                    , MEM_ID
+                    , ROW_NUMBER() OVER (PARTITION BY MEM_ID ORDER BY START_DATE DESC) AS rn
+                FROM SANCTION
+            ) T
+            WHERE T.rn = 1
+        ) S ON M.MEM_ID = S.MEM_ID
+        WHERE M.MEM_ID = #{memId}
     </select>
 </mapper>

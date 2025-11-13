@@ -58,18 +58,23 @@ public class JwtConfirmFilter extends OncePerRequestFilter {
 
         // Redis에서 제재 상태 확인
         String memStatus = redisService.getMemberStatus(memId);
+        if("BANNED".equals(memStatus)){
+          log.warn("제재된 사용자 접근 차단 : memId {}", memId);
+          response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+          response.getWriter().write("계정이 정지되었습니다.");
+          return;
+        }
 
         // 토큰에서 username과 role 획득
         String username = jwtUtil.getUsername(token);
         String role = jwtUtil.getRole(token);
-        int userId = jwtUtil.getMemIdFromToken(token);
 
         // userEntity를 생성하여 값 set
         MemberDTO memberDTO = new MemberDTO();
 
         memberDTO.setMemEmail(username);
         memberDTO.setMemRole(role);
-        memberDTO.setMemId(userId);
+        memberDTO.setMemId(memId);
 
         // userDetail에 회원 정보 객체 담기
         CustomUserDetails customUserDetails = new CustomUserDetails(memberDTO);

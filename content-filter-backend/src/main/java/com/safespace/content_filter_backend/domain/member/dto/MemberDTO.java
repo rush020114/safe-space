@@ -1,5 +1,6 @@
 package com.safespace.content_filter_backend.domain.member.dto;
 
+import com.safespace.content_filter_backend.domain.sanction.dto.SanctionDTO;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -19,6 +20,8 @@ public class MemberDTO {
   private String memStatus;
   private int warningCnt;
   private LocalDateTime bannedUntil;
+
+  private SanctionDTO sanctionDTO;
 
   public MemberDTO(){
   }

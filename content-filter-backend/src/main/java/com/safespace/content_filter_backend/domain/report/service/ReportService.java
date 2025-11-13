@@ -119,7 +119,8 @@ public class ReportService {
         sanctionMapper.regSanction(sanctionDTO);
         memberMapper.banMember(bannedUntil, targetMemId);
       } else {
-        throw new IllegalArgumentException("신고 횟수가 정확하지 않습니다.");
+        // ✅ throw 제거하고 로그만
+        log.info("경고 {}회 - 제재 없음 (콘텐츠 필터링만)", warningCnt);
       }
     } else if (isRejected) {
       // 신고 상태 처리
