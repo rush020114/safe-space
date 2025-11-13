@@ -3,7 +3,7 @@ package com.safespace.content_filter_backend.auth.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.safespace.content_filter_backend.auth.dto.CustomUserDetails;
 import com.safespace.content_filter_backend.auth.util.JwtUtil;
-import com.safespace.content_filter_backend.member.dto.MemberDTO;
+import com.safespace.content_filter_backend.domain.member.dto.MemberDTO;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletInputStream;

@@ -3,8 +3,8 @@
 
 <!-- 해당 파일에 모든 쿼리문을 작성 -->
 <!-- namespace에는 xml파일과 연결할 Mapper interface 파일명을 패키지를 포함하여 적어주세요 -->
-<mapper namespace="com.safespace.content_filter_backend.post.mapper.PostMapper">
-    <resultMap id="post" type="com.safespace.content_filter_backend.post.dto.PostDTO">
+<mapper namespace="com.safespace.content_filter_backend.domain.post.mapper.PostMapper">
+    <resultMap id="post" type="com.safespace.content_filter_backend.domain.post.dto.PostDTO">
         <id     column="POST_ID"       property="postId" />
         <result column="POST_TITLE"    property="postTitle" />
         <result column="POST_CONTENT"  property="postContent" />
@@ -12,10 +12,10 @@
         <result column="CREATED_AT"    property="createdAt" />
         <result column="MEM_ID"        property="memId" />
         <association property="postImgDTO" resultMap="postImg" />
-        <collection property="commentDTOList" resultMap="com.safespace.content_filter_backend.comment.mapper.CommentMapper.comment" />
+        <collection property="commentDTOList" resultMap="com.safespace.content_filter_backend.domain.comment.mapper.CommentMapper.comment" />
     </resultMap>
 
-    <resultMap id="postImg" type="com.safespace.content_filter_backend.post.dto.PostImgDTO">
+    <resultMap id="postImg" type="com.safespace.content_filter_backend.domain.post.dto.PostImgDTO">
         <id     column="IMG_NUM"            property="imgNum" />
         <result column="ORIGIN_IMG_NAME"    property="originImgName" />
         <result column="ATTACHED_IMG_NAME"  property="attachedImgName" />
@@ -93,7 +93,7 @@
         ON P.POST_ID = C.POST_ID
         WHERE p.POST_ID = #{postId}
         AND p.IS_FILTERED = 'N'
-        AND C.IS_FILTERED = 'N'
+        AND (C.IS_FILTERED = 'N' OR C.IS_FILTERED IS NULL)
     </select>
 
     <!-- 게시글 필터링 -->

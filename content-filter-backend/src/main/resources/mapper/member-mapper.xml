@@ -3,8 +3,8 @@
 
 <!-- 해당 파일에 모든 쿼리문을 작성 -->
 <!-- namespace에는 xml파일과 연결할 Mapper interface 파일명을 패키지를 포함하여 적어주세요 -->
-<mapper namespace="com.safespace.content_filter_backend.member.mapper.MemberMapper">
-	<resultMap id="member" type="com.safespace.content_filter_backend.member.dto.MemberDTO">
+<mapper namespace="com.safespace.content_filter_backend.domain.member.mapper.MemberMapper">
+	<resultMap id="member" type="com.safespace.content_filter_backend.domain.member.dto.MemberDTO">
         <id     column="MEM_ID"        property="memId" />
         <result column="MEM_EMAIL"     property="memEmail" />
         <result column="MEM_PW"        property="memPw" />
@@ -56,4 +56,13 @@
                     ELSE 'WARNING' END
         WHERE MEM_ID = #{reportedId};
     </update>
+
+    <!-- 회원 제재를 위한 조회(redis) -->
+    <select id="getMemberStatusById" resultMap="member">
+        SELECT MEM_STATUS
+            , WARNING_CNT
+            , BANNED_UNTIL
+        FROM MEMBER
+        WHERE MEM_ID = #{memId}
+    </select>
 </mapper>

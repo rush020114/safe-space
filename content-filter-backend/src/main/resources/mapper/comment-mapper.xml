@@ -3,8 +3,8 @@
 
 <!-- 해당 파일에 모든 쿼리문을 작성 -->
 <!-- namespace에는 xml파일과 연결할 Mapper interface 파일명을 패키지를 포함하여 적어주세요 -->
-<mapper namespace="com.safespace.content_filter_backend.comment.mapper.CommentMapper">
-    <resultMap id="comment" type="com.safespace.content_filter_backend.comment.dto.CommentDTO">
+<mapper namespace="com.safespace.content_filter_backend.domain.comment.mapper.CommentMapper">
+    <resultMap id="comment" type="com.safespace.content_filter_backend.domain.comment.dto.CommentDTO">
         <id     column="CMT_ID"        property="cmtId" />
         <result column="CMT_CONTENT"   property="cmtContent" />
         <result column="CREATED_AT"    property="createdAt" />

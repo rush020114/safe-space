@@ -1,8 +1,8 @@
 package com.safespace.content_filter_backend.auth.service;
 
 import com.safespace.content_filter_backend.auth.dto.CustomUserDetails;
-import com.safespace.content_filter_backend.member.dto.MemberDTO;
-import com.safespace.content_filter_backend.member.service.MemberService;
+import com.safespace.content_filter_backend.domain.member.dto.MemberDTO;
+import com.safespace.content_filter_backend.domain.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;

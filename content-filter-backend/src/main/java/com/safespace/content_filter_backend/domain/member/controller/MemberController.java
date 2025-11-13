@@ -1,0 +1,39 @@
+package com.safespace.content_filter_backend.domain.member.controller;
+
+import com.safespace.content_filter_backend.domain.member.dto.MemberDTO;
+import com.safespace.content_filter_backend.domain.member.service.MemberService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@Slf4j
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/members")
+public class MemberController {
+  private final MemberService memberService;
+
+  @PostMapping("")
+  public ResponseEntity<?> regMember(@RequestBody MemberDTO memberDTO){
+    try {
+      memberService.regMember(memberDTO);
+      log.info("회원가입 성공 - 이메일 : {}", memberDTO.getMemEmail());
+      return ResponseEntity
+              .status(HttpStatus.CREATED)
+              .body("회원가입 성공");
+    } catch (RuntimeException e) {
+      log.info("회원가입 실패 - 입력 오류 : {}", e.getMessage());
+      return ResponseEntity
+              .status(HttpStatus.BAD_REQUEST)
+              .body(e.getMessage());
+    } catch (Exception e) {
+      log.info("회원가입 실패 - 서버 오류", e);
+      return ResponseEntity
+              .status(HttpStatus.INTERNAL_SERVER_ERROR)
+              .body("회원가입 중 서버 오류 발생");
+    }
+  }
+
+}

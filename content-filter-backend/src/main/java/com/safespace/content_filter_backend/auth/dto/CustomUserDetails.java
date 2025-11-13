@@ -1,6 +1,6 @@
 package com.safespace.content_filter_backend.auth.dto;
 
-import com.safespace.content_filter_backend.member.dto.MemberDTO;
+import com.safespace.content_filter_backend.domain.member.dto.MemberDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
