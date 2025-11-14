@@ -59,7 +59,8 @@
     <update id="banMember">
         UPDATE MEMBER
         SET MEM_STATUS = CASE
-            WHEN MOD(WARNING_CNT, 3) = 0 THEN 'BANNED'
+        WHEN WARNING_CNT >= 9 THEN 'BANNED'
+        WHEN MOD(WARNING_CNT, 3) = 0 THEN 'BANNED'
             ELSE 'WARNING' END
         , BANNED_UNTIL = STR_TO_DATE(#{bannedUntil}, '%Y-%m-%d %H:%i:%s')
         WHERE MEM_ID = #{reportedId}

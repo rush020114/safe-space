@@ -9,14 +9,9 @@ import { useSelector } from 'react-redux';
 
 const AdminReportList = () => {
   const token = useSelector(state => state.auth.token);
-
-  // 탭 전환 state 변수
+  const [reload, setReload] = useState(0);
   const [activeTab, setActiveTab] = useState('POST');
-
-  // 게시글 신고 목록
   const [PostReportList, setPostReportList] = useState([]);
-
-  // 댓글 신고 목록
   const [commentReportList, setCommentReportList] = useState([]);
 
   // 초기 데이터 로딩
@@ -28,19 +23,17 @@ const AdminReportList = () => {
     axiosInstance.get(`${SERVER_URL}/admin/reports/COMMENT`)
       .then(res => setCommentReportList(res.data))
       .catch(handleError);
-  }, []);
+  }, [reload]);
 
   // SSE 실시간 통신
   useAdminSSE({
     token,
     onReport: newReport => {
-      console.log(newReport)
+      console.log('새 신고:', newReport);
       alert(`새로운 신고가 접수되었습니다!\n내용: ${newReport.reportReason}`);
-      if (newReport.reportTarget === 'POST') {
-        setPostReportList(prev => [newReport, ...prev]);
-      } else if (newReport.reportTarget === 'COMMENT') {
-        setCommentReportList(prev => [newReport, ...prev]);
-      }
+      
+      // ✅ reload로 최신 데이터 가져오기
+      setReload(prev => prev + 1);
     }
   });
 
@@ -49,11 +42,9 @@ const AdminReportList = () => {
     axiosInstance.put(`${SERVER_URL}/admin/reports/${reportProccessId}`, reportProcessData)
       .then(res => {
         alert(res.data);
-        if (reportProcessData.reportTarget === 'POST') {
-          setPostReportList(prev => prev.filter(r => r.reportId !== reportProccessId));
-        } else if (reportProcessData.reportTarget === 'COMMENT') {
-          setCommentReportList(prev => prev.filter(r => r.reportId !== reportProccessId));
-        }
+        
+        // ✅ reload로 최신 데이터 가져오기
+        setReload(prev => prev + 1);
       })
       .catch(handleError);
   };

@@ -74,7 +74,9 @@ public class ReportService {
 
     if (isApproved) {
       // 신고 상태 처리
-      reportMapper.handleReport(reportDTO);
+      int update = reportMapper.handleReport(reportDTO);
+      if(update == 0)
+        throw new IllegalArgumentException("이미 처리된 신고입니다.");
 
       // 신고 대상 정보 추출
       int targetMemId = isPost
@@ -103,7 +105,7 @@ public class ReportService {
       String sanctionReason = null;
 
       if (warningCnt >= 9) {
-        bannedUntil = LocalDateTime.of(9999, 12, 31, 23, 59);
+        bannedUntil = LocalDateTime.of(2099, 12, 31, 23, 59);
         String bannedUntilStr = bannedUntil.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
         sanctionType = "BAN_PERMANENT";

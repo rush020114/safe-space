@@ -84,7 +84,7 @@ public class AdminReportController {
       log.info("신고 처리 실패 - 서버 오류", e);
       return ResponseEntity
               .status(HttpStatus.INTERNAL_SERVER_ERROR)
-              .body("중복된 신고입니다.");
+              .body("신고 처리 중 서버 오류 발생");
     }
   }
 
