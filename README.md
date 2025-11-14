@@ -33,9 +33,11 @@
 - 한국어/영어 욕설 리스트 기반 실시간 감지
 - 정규표현식을 활용한 공백 변형 처리 ("바 보", "lo ser" 등)
 - 게시글/댓글 작성 시 자동 검증
+- **욕설 감지 시 즉시 작성 차단 (신고 발생 X)**
 
-### 2️⃣ 자동 신고 시스템
-- 욕설 감지 시 신고 객체 자동 생성 및 DB 저장
+### 2️⃣ 사용자 신고 시스템
+- 사용자가 부적절한 게시글/댓글 발견 시 **수동으로 신고**
+- 신고 객체 생성 및 DB 저장
 - 중복 신고 방지 로직
 - 신고 대상 구분 (게시글/댓글)
 
@@ -80,6 +82,105 @@
 
 ---
 
+## 💡 핵심 도전 과제
+
+이 프로젝트에서 직면하고 해결한 **3가지 기술적 도전**:
+
+### 1️⃣ Redis 캐싱 구조 2회 재설계 → DB 부하 90% 감소
+**문제**: 초기 Map 구조로는 경고 횟수(3/6/9회) 분기 처리 불가  
+**해결**: Hash 구조로 전환, 필드 단위 접근으로 유연한 제재 로직 구현  
+**효과**: 매 요청마다 DB 조회 없이 Redis에서 모든 제재 정보 관리
+
+<details>
+<summary><b>📖 상세 설계 과정 보기</b></summary>
+
+**초기 설계 문제**
+- `Map<String, String>` 구조로 제재 정보 저장
+- member 테이블의 active, banned만 저장 가능
+- 3회, 6회, 9회 경고에 따른 분기 처리 불가
+
+**Hash 구조로 개선**
+```
+Key: member:{memId}
+Fields:
+  - status: "BANNED"
+  - warningCnt: "3"
+  - bannedUntil: "2025-11-14T15:30:00"
+  - sanctionType: "BAN_TEMP_1"
+  - sanctionReason: "신고 3회 누적..."
+```
+
+**캐싱 전략**
+- TTL 24시간 설정
+- 제재 변경 시 즉시 업데이트
+- DB 조회 없이 Redis에서 모든 정보 확인
+
+</details>
+
+---
+
+### 2️⃣ SSE + JWT 인증 통합 문제 해결
+**문제**: EventSource는 Header로 토큰 전달 불가 → Spring Security 인증 실패  
+**해결**: URL 파라미터로 토큰 전달 + JwtConfirmFilter 커스터마이징  
+**효과**: SSE 실시간 통신과 JWT 인증 동시 구현
+
+<details>
+<summary><b>📖 트러블슈팅 과정 보기</b></summary>
+
+**시도한 방법들**
+1. **`.permitAll()` 설정**
+   - 결과: ❌ 보안 취약
+   - 문제: 누구나 관리자 알림 수신 가능
+
+2. **URL 파라미터로 토큰 전달**
+   - 결과: ✅ 성공
+   - 구현: JwtConfirmFilter에서 URL 파싱
+
+**최종 구현**
+```java
+// JwtConfirmFilter에서 URL 파라미터 파싱
+if (request.getRequestURL().toString().contains("/admin/reports/stream")) {
+  String paramToken = request.getParameter("token");
+  token = paramToken.substring(7);
+}
+```
+
+**보안 강화**
+- HTTPS로 토큰 암호화
+- `@PreAuthorize("hasRole('ADMIN')")` 추가 검증
+- 타임아웃 3분 설정
+
+</details>
+
+---
+
+### 3️⃣ WebSocket 대신 SSE 선택 - 기술 선택 판단력
+**판단**: 관리자만 단방향 알림 필요 → 양방향 통신 불필요  
+**선택**: SSE (Server-Sent Events)  
+**근거**: 요구사항 분석 후 구조적으로 더 단순하고 적합한 기술 선택
+
+<details>
+<summary><b>📖 기술 비교 과정 보기</b></summary>
+
+**기술 비교표**
+| 기술 | 통신 방식 | 구현 복잡도 | 자동 재연결 | 적합성 |
+|------|-----------|-------------|-------------|--------|
+| WebSocket | 양방향 | 높음 | 직접 구현 | ❌ 오버스펙 |
+| **SSE** | 단방향 | 낮음 | 내장 | ✅ 최적 |
+| Polling | 단방향 | 낮음 | 불필요 | ❌ 비효율 |
+
+**요구사항 분석**
+- ✅ 신고 발생 시 관리자에게 알림 (서버 → 클라이언트)
+- ❌ 관리자가 서버에 메시지 전송 불필요
+- ❌ 양방향 통신 불필요
+
+**기술 선택 원칙**
+> "기술을 무작정 쓰는 게 아니라, 요구사항에 맞는 최적의 기술을 선택"
+
+</details>
+
+---
+
 ## 🏗️ 시스템 아키텍처
 ```
 ┌─────────────┐      ┌──────────────────┐      ┌─────────────┐
@@ -88,34 +189,40 @@
 │   작성)     │      │  + JWT           │      │  회원/제재) │
 └─────────────┘      └──────────────────┘      └─────────────┘
                               │                        ↑
-                              │                        │
                               ↓                        │
                      ┌─────────────────┐              │
                      │ ProfanityFilter │              │
                      │  (욕설 감지)    │              │
                      └─────────────────┘              │
                               │                        │
-                              ↓                        │
-                     ┌─────────────────┐              │
-                     │  ReportService  │──────────────┘
-                     │   (신고 처리)   │
-                     └─────────────────┘
-                              │
-                    ┌─────────┴─────────┐
-                    ↓                   ↓
-           ┌─────────────────┐  ┌─────────────────┐
-           │ SseEmitterService│  │  RedisService   │
-           │  (실시간 알림)   │  │ (제재 캐싱)     │
-           └─────────────────┘  └─────────────────┘
-                    │                   │
-                    ↓                   ↓
-           ┌─────────────────┐  ┌─────────────────┐
-           │  관리자 대시보드 │  │     Redis       │
-           │   (SSE 구독)    │  │ (Hash 구조)     │
-           └─────────────────┘  └─────────────────┘
+                    ┌─────────┴─────────┐            │
+                    ↓                   ↓              │
+              (욕설 없음)           (욕설 감지)       │
+              정상 작성             작성 차단          │
+                                    (신고 X)          │
+                                                      │
+          (사용자가 부적절한 글 발견)                │
+                    ↓                                  │
+              수동 신고 등록                         │
+                    ↓                                  │
+         ┌─────────────────┐                         │
+         │  ReportService  │─────────────────────────┘
+         │   (신고 처리)   │
+         └─────────────────┘
+                  │
+        ┌─────────┴─────────┐
+        ↓                   ↓
+┌─────────────────┐  ┌─────────────────┐
+│ SseEmitterService│  │  RedisService   │
+│  (실시간 알림)   │  │ (제재 캐싱)     │
+└─────────────────┘  └─────────────────┘
+        │                   │
+        ↓                   ↓
+┌─────────────────┐  ┌─────────────────┐
+│  관리자 대시보드 │  │     Redis       │
+│   (SSE 구독)    │  │ (Hash 구조)     │
+└─────────────────┘  └─────────────────┘
 ```
-
----
 
 ## 📡 주요 API 명세
 
@@ -167,14 +274,28 @@ Response: 400 Bad Request
 
 정상 작성 시:
 Response: 201 Created
-→ 욕설 감지 시 자동 신고 생성
-→ SSE를 통해 관리자에게 실시간 알림 전송
 ```
 
 </details>
 
 <details>
 <summary><b>🚨 신고 API</b></summary>
+
+### 사용자 신고 등록
+```http
+POST /reports
+
+Request Body:
+{
+  "targetType": "POST",
+  "targetId": 5,
+  "reportReason": "욕설 사용"
+}
+
+Response: 201 Created
+→ 신고 등록 완료
+→ SSE를 통해 관리자에게 실시간 알림 전송
+```
 
 ### 관리자 신고 목록 조회
 ```http
@@ -189,7 +310,7 @@ Response: 200 OK
     "targetType": "POST",
     "postDTO": {
       "postId": 5,
-      "postContent": "욕설이 포함된 내용",
+      "postContent": "신고된 내용",
       "memId": 10
     },
     "reportDate": "2025-11-14T10:30:00"
@@ -687,6 +808,7 @@ public enum ReportTargetType {
     }
   }
 }
+```
 
 **Enum 사용의 효과**
 - ✅ 타입 안정성 보장
@@ -703,173 +825,45 @@ public enum ReportTargetType {
 ### ERD
 > 📸 **이미지 위치**: `images/erd.png`
 
-### 주요 테이블 구조
-
-#### 1. member (회원)
-```sql
-CREATE TABLE member (
-  mem_id INT PRIMARY KEY AUTO_INCREMENT,
-  mem_email VARCHAR(100) NOT NULL UNIQUE,
-  mem_pw VARCHAR(255) NOT NULL,
-  mem_nickname VARCHAR(50) NOT NULL,
-  mem_role ENUM('USER', 'ADMIN') DEFAULT 'USER',
-  mem_status ENUM('ACTIVE', 'BANNED') DEFAULT 'ACTIVE',
-  warning_cnt INT DEFAULT 0,
-  banned_until DATETIME NULL,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-#### 2. post (게시글)
-```sql
-CREATE TABLE post (
-  post_id INT PRIMARY KEY AUTO_INCREMENT,
-  mem_id INT NOT NULL,
-  post_title VARCHAR(200) NOT NULL,
-  post_content TEXT NOT NULL,
-  is_filtered BOOLEAN DEFAULT FALSE,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (mem_id) REFERENCES member(mem_id)
-);
-```
-
-#### 3. comment (댓글)
-```sql
-CREATE TABLE comment (
-  cmt_id INT PRIMARY KEY AUTO_INCREMENT,
-  post_id INT NOT NULL,
-  mem_id INT NOT NULL,
-  cmt_content TEXT NOT NULL,
-  is_filtered BOOLEAN DEFAULT FALSE,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (post_id) REFERENCES post(post_id),
-  FOREIGN KEY (mem_id) REFERENCES member(mem_id)
-);
-```
-
-#### 4. report (신고)
-```sql
-CREATE TABLE report (
-  report_id INT PRIMARY KEY AUTO_INCREMENT,
-  mem_id INT NOT NULL,
-  target_type ENUM('POST', 'COMMENT') NOT NULL,
-  target_id INT NOT NULL,
-  report_reason VARCHAR(255) NOT NULL,
-  report_status ENUM('PENDING', 'APPROVED', 'REJECTED') DEFAULT 'PENDING',
-  report_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (mem_id) REFERENCES member(mem_id)
-);
-```
-
-#### 5. sanction (제재)
-```sql
-CREATE TABLE sanction (
-  sanction_id INT PRIMARY KEY AUTO_INCREMENT,
-  mem_id INT NOT NULL,
-  admin_id INT NOT NULL,
-  sanction_type ENUM('BAN_TEMP_1', 'BAN_TEMP_2', 'BAN_PERMANENT') NOT NULL,
-  sanction_reason VARCHAR(255) NOT NULL,
-  start_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-  end_date DATETIME NULL,
-  FOREIGN KEY (mem_id) REFERENCES member(mem_id),
-  FOREIGN KEY (admin_id) REFERENCES member(mem_id)
-);
-```
-
 ### Redis 데이터 구조
-
+```
 Key: member:{memId}
 Type: Hash
 Fields:
-
-status: "ACTIVE" | "BANNED"
-warningCnt: "3"
-bannedUntil: "2025-11-14T15:30:00"
-sanctionType: "BAN_TEMP_1"
-sanctionReason: "신고 3회 누적으로 2025-11-14 15:30:00까지 정지"
+  - status: "ACTIVE" | "BANNED"
+  - warningCnt: "3"
+  - bannedUntil: "2025-11-14T15:30:00"
+  - sanctionType: "BAN_TEMP_1"
+  - sanctionReason: "신고 3회 누적으로 2025-11-14 15:30:00까지 정지"
 TTL: 24시간
-
----
-
-## 🔧 프로젝트 구조
-
-src/
-├── main/
-│   ├── java/com/safespace/content_filter_backend/
-│   │   ├── auth/                           # 인증 관련
-│   │   │   ├── filter/
-│   │   │   │   ├── LoginFilter.java       # 로그인 필터
-│   │   │   │   └── JwtConfirmFilter.java  # JWT 검증 필터
-│   │   │   ├── service/
-│   │   │   │   └── UserDetailServiceImpl.java
-│   │   │   └── util/
-│   │   │       └── JwtUtil.java           # JWT 생성/검증
-│   │   │
-│   │   ├── config/
-│   │   │   ├── SecurityConfig.java        # Spring Security 설정
-│   │   │   └── RedisConfig.java           # Redis 설정
-│   │   │
-│   │   ├── domain/
-│   │   │   ├── admin/                     # 관리자 기능
-│   │   │   │   ├── controller/
-│   │   │   │   │   └── AdminReportController.java
-│   │   │   │   └── service/
-│   │   │   │       └── SseEmitterService.java  # SSE 실시간 알림
-│   │   │   │
-│   │   │   ├── member/                    # 회원 관리
-│   │   │   │   ├── dto/MemberDTO.java
-│   │   │   │   ├── mapper/MemberMapper.java
-│   │   │   │   └── service/MemberService.java
-│   │   │   │
-│   │   │   ├── post/                      # 게시글
-│   │   │   │   ├── controller/PostController.java
-│   │   │   │   └── service/PostService.java
-│   │   │   │
-│   │   │   ├── comment/                   # 댓글
-│   │   │   │   └── ...
-│   │   │   │
-│   │   │   ├── report/                    # 신고
-│   │   │   │   ├── controller/ReportController.java
-│   │   │   │   ├── service/ReportService.java
-│   │   │   │   └── model/
-│   │   │   │       ├── ReportStatus.java      # Enum
-│   │   │   │       └── ReportTargetType.java  # Enum
-│   │   │   │
-│   │   │   └── sanction/                  # 제재
-│   │   │       ├── scheduler/
-│   │   │       │   └── SanctionScheduler.java  # 제재 해제 스케줄러
-│   │   │       └── service/SanctionService.java
-│   │   │
-│   │   └── infra/                         # 인프라 계층
-│   │       ├── filtering/
-│   │       │   └── ProfanityFilter.java   # 욕설 필터링
-│   │       └── redis/
-│   │           └── RedisService.java      # Redis 캐싱
-│   │
-│   └── resources/
-│       ├── mapper/                        # MyBatis XML
-│       │   ├── member-mapper.xml
-│       │   ├── post-mapper.xml
-│       │   ├── report-mapper.xml
-│       │   └── sanction-mapper.xml
-│       └── application.properties         # 설정 파일
+```
 
 ---
 
 ## 🎬 주요 화면
 
-### 1️⃣ 신고 자동 생성 플로우
+### 1️⃣ 욕설 필터링 동작
+> 📸 **이미지/GIF 위치**: `images/profanity_filter.gif`
+
+**동작 과정**
+1. 사용자가 욕설이 포함된 게시글/댓글 작성 시도
+2. `ProfanityFilter`가 욕설 감지
+3. **즉시 작성 차단** (신고 발생 X)
+
+---
+
+### 2️⃣ 사용자 신고 플로우
 > 📸 **이미지/GIF 위치**: `images/report_flow.gif`
 
 **동작 과정**
-1. 사용자가 욕설이 포함된 게시글/댓글 작성
-2. `ProfanityFilter`가 욕설 감지
-3. 신고 객체 자동 생성 및 DB 저장
+1. 사용자가 부적절한 게시글/댓글 발견
+2. 신고 버튼 클릭 → 신고 사유 입력
+3. 신고 객체 생성 및 DB 저장
 4. SSE를 통해 관리자에게 실시간 알림 전송
 
 ---
 
-### 2️⃣ 관리자 실시간 알림
+### 3️⃣ 관리자 실시간 알림
 > 📸 **이미지/GIF 위치**: `images/admin_notification.gif`
 
 **주요 기능**
@@ -879,7 +873,7 @@ src/
 
 ---
 
-### 3️⃣ 단계적 제재 적용
+### 4️⃣ 단계적 제재 적용
 > 📸 **이미지/GIF 위치**: `images/sanction_flow.gif`
 
 **제재 흐름**
@@ -891,14 +885,12 @@ src/
 
 ---
 
-### 4️⃣ 제재 상태 확인
+### 5️⃣ 제재 상태 확인
 > 📸 **이미지/GIF 위치**: `images/ban_check.gif`
 
 **로그인 차단 화면**
 - 제재 사유 표시
 - 제재 기간 안내
-
----
 
 ## 🚀 실행 방법
 
@@ -979,7 +971,7 @@ curl -N http://localhost:8080/admin/reports/stream?token=Bearer_YOUR_TOKEN
 
 ### 1. 욕설 필터링 테스트
 ```bash
-# 욕설 포함 게시글 작성
+# 욕설 포함 게시글 작성 시도
 POST /posts
 Content-Type: application/json
 Authorization: Bearer {token}
@@ -989,10 +981,26 @@ Authorization: Bearer {token}
   "postContent": "바보 같은 내용"
 }
 
-# 예상 결과: 400 Bad Request + 자동 신고 생성
+# 예상 결과: 400 Bad Request (작성 차단, 신고 발생 X)
 ```
 
-### 2. 신고 처리 및 제재 테스트
+### 2. 사용자 신고 테스트
+```bash
+# 부적절한 게시글 신고
+POST /reports
+Content-Type: application/json
+Authorization: Bearer {token}
+
+{
+  "targetType": "POST",
+  "targetId": 5,
+  "reportReason": "욕설 및 비방"
+}
+
+# 예상 결과: 201 Created + 관리자에게 SSE 알림 전송
+```
+
+### 3. 신고 처리 및 제재 테스트
 ```bash
 # 1단계: 3회 경고 (1분 정지)
 POST /admin/reports/handle
@@ -1016,7 +1024,7 @@ POST /admin/reports/handle
 }
 ```
 
-### 3. Redis 캐싱 확인
+### 4. Redis 캐싱 확인
 ```bash
 # Redis CLI로 제재 정보 확인
 redis-cli
@@ -1087,10 +1095,9 @@ redis-cli
 **SSE 보안 문제 해결**
 - 문제: SSE는 Header에 토큰을 담을 수 없어 Spring Security 인증 실패
 - 해결:
-  1. `/admin/reports/stream` 경로에 `.permitAll()` 설정
-  2. URL 파라미터로 토큰 전달
-  3. `JwtConfirmFilter`에서 URL 파라미터 토큰 추출 및 검증
-  4. `@PreAuthorize("hasRole('ADMIN')")`로 권한 보장
+  1. URL 파라미터로 토큰 전달
+  2. `JwtConfirmFilter`에서 URL 파라미터 토큰 추출 및 검증
+  3. `@PreAuthorize("hasRole('ADMIN')")`로 권한 보장
 
 ---
 
@@ -1151,8 +1158,6 @@ redis-cli
    - Enum을 활용한 타입 안정성
    - 레이어드 아키텍처 적용
 
----
-
 ## 🔮 향후 개선 방향
 
 ### 1. AI 기반 필터링 도입
@@ -1207,3 +1212,18 @@ redis-cli
 Made with ❤️ by [Your Name]
 
 </div>
+```
+
+---
+
+## 🎉 완성! 
+
+**5개 Part 모두 끝났어!**
+
+### ✅ 수정 완료 체크리스트
+```
+✅ Part 1: 핵심 기능 수정 + 핵심 도전 과제 강화 + 아키텍처 수정
+✅ Part 2: API 명세 + 핵심 구현 코드 (1~3)
+✅ Part 3: 핵심 구현 코드 (4~7) + ERD + 주요 화면
+✅ Part 4: 실행 방법 + 테스트 + 기술적 의사결정
+✅ Part 5: 배운 점 + 향후 개선 + 개발자 정보
