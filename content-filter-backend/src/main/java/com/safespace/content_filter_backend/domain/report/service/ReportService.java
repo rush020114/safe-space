@@ -17,7 +17,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Slf4j
@@ -100,8 +102,10 @@ public class ReportService {
       String sanctionType = null;
       String sanctionReason = null;
 
-      if (warningCnt == 9) {
+      if (warningCnt >= 9) {
         bannedUntil = LocalDateTime.of(9999, 12, 31, 23, 59);
+        String bannedUntilStr = bannedUntil.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
         sanctionType = "BAN_PERMANENT";
         sanctionReason = "신고 9회 누적으로 영구 정지";
 
@@ -110,13 +114,14 @@ public class ReportService {
         sanctionDTO.setMemId(targetMemId);
         sanctionDTO.setAdminId(adminId);
         sanctionMapper.regSanction(sanctionDTO);
-        memberMapper.banMember(bannedUntil, targetMemId);
+        memberMapper.banMember(bannedUntilStr, targetMemId);
 
         // Redis 업데이트
         redisService.updateMemberStatus(targetMemId, "BANNED", bannedUntil, sanctionType, sanctionReason);
 
       } else if (warningCnt == 6) {
         bannedUntil = LocalDateTime.now().plusMinutes(3);
+        String bannedUntilStr = bannedUntil.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         sanctionType = "BAN_TEMP_2";
         sanctionReason = "신고 6회 누적으로 " + bannedUntil + "까지 정지";
 
@@ -126,13 +131,14 @@ public class ReportService {
         sanctionDTO.setMemId(targetMemId);
         sanctionDTO.setAdminId(adminId);
         sanctionMapper.regSanction(sanctionDTO);
-        memberMapper.banMember(bannedUntil, targetMemId);
+        memberMapper.banMember(bannedUntilStr, targetMemId);
 
         // Redis 업데이트
         redisService.updateMemberStatus(targetMemId, "BANNED", bannedUntil, sanctionType, sanctionReason);
 
       } else if (warningCnt == 3) {
         bannedUntil = LocalDateTime.now().plusMinutes(1);
+        String bannedUntilStr = bannedUntil.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         sanctionType = "BAN_TEMP_1";
         sanctionReason = "신고 3회 누적으로 " + bannedUntil + "까지 정지";
 
@@ -142,7 +148,7 @@ public class ReportService {
         sanctionDTO.setMemId(targetMemId);
         sanctionDTO.setAdminId(adminId);
         sanctionMapper.regSanction(sanctionDTO);
-        memberMapper.banMember(bannedUntil, targetMemId);
+        memberMapper.banMember(bannedUntilStr, targetMemId);
 
         // Redis 업데이트
         redisService.updateMemberStatus(targetMemId, "BANNED", bannedUntil, sanctionType, sanctionReason);

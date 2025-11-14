@@ -4,6 +4,7 @@ import com.safespace.content_filter_backend.domain.member.dto.MemberDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public interface MemberMapper {
   void addWarningCnt(int reportedId);
 
   // 회원 제재
-  void banMember(LocalDateTime bannedUntil, int reportedId);
+  void banMember(@Param("bannedUntil") String bannedUntil, int reportedId);
 
   // 회원 제재를 위한 조회
   MemberDTO getMemberStatusById(int memId);

@@ -61,13 +61,13 @@
         SET MEM_STATUS = CASE
             WHEN MOD(WARNING_CNT, 3) = 0 THEN 'BANNED'
             ELSE 'WARNING' END
-        , BANNED_UNTIL = #{bannedUntil}
+        , BANNED_UNTIL = STR_TO_DATE(#{bannedUntil}, '%Y-%m-%d %H:%i:%s')
         WHERE MEM_ID = #{reportedId}
     </update>
 
     <!-- 회원 제재를 위한 조회(redis) -->
     <select id="getMemberStatusById" resultMap="member">
-        SELECT M.MEMBER_STATUS
+        SELECT M.MEM_STATUS
             , M.BANNED_UNTIL
             , M.WARNING_CNT
             , S.SANCTION_REASON

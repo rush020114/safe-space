@@ -81,5 +81,6 @@
         UPDATE REPORT
         SET REPORT_STATUS = #{reportStatus}
         WHERE REPORT_ID = #{reportId}
+        AND REPORT_STATUS = 'PENDING'
     </update>
 </mapper>

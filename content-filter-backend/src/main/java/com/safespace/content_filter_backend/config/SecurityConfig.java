@@ -65,7 +65,7 @@ public class SecurityConfig {
 
     // 로그인 프로세스를 진행하는 loginFilter 클래스를 SecurityFilterChain에 추가
     // UsernamePasswordAuthenticationFilter 클래스 위치에 LoginFilter를 사용하겠다는 뜻
-    httpSecurity.addFilterAt(new LoginFilter(authenticationManager, jwtUtil), UsernamePasswordAuthenticationFilter.class);
+    httpSecurity.addFilterAt(new LoginFilter(authenticationManager, jwtUtil, redisService), UsernamePasswordAuthenticationFilter.class);
     // JWT 토큰 존재 여부 및 유효성 검사를 위한 필터 추가
     // LoginFilter보다 먼저 실행되도록 필터 체인에 등록
     httpSecurity.addFilterBefore(new JwtConfirmFilter(jwtUtil, redisService), LoginFilter.class);

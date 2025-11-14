@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.safespace.content_filter_backend.auth.dto.CustomUserDetails;
 import com.safespace.content_filter_backend.auth.util.JwtUtil;
 import com.safespace.content_filter_backend.domain.member.dto.MemberDTO;
+import com.safespace.content_filter_backend.domain.sanction.dto.SanctionDTO;
+import com.safespace.content_filter_backend.infra.redis.RedisService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletInputStream;
@@ -32,11 +34,13 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
   // Spring Security에서 로그인 검증을 담당하는 핵심 인터페이스
   private final AuthenticationManager authenticationManager;
   private final JwtUtil jwtUtil;
+  private final RedisService redisService;
 
   // 생성자를 통해 authenticationManager 객체를 의존성 주입 받는다.
-  public LoginFilter(AuthenticationManager authenticationManager, JwtUtil jwtUtil){
+  public LoginFilter(AuthenticationManager authenticationManager, JwtUtil jwtUtil , RedisService redisService){
     this.authenticationManager = authenticationManager;
     this.jwtUtil = jwtUtil;
+    this.redisService = redisService;
 
     // 로그인 요청의 기본값과 아이디, 비밀번호의 기본값을 바꾸기 위한 세팅
     // 로그인 요청 url 설정
@@ -91,6 +95,34 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     CustomUserDetails userDetails = (CustomUserDetails) authResult.getPrincipal();
     MemberDTO memberDTO = userDetails.getMemberDTO();
     int memId = memberDTO.getMemId();
+
+    // Redis에서 제재 상태 확인
+    MemberDTO memberInfo = redisService.getMemberSanctionInfo(memId);
+    if("BANNED".equals(memberInfo.getMemStatus())){
+      SanctionDTO sanctionDTO = memberInfo.getSanctionDTO();
+
+      if(sanctionDTO != null) {
+        String sanctionReason = sanctionDTO.getSanctionReason();
+        log.warn("제재된 사용자 접근 차단: memId={}, reason={}", memId, sanctionReason);
+
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        response.setContentType("application/json;charset=UTF-8");
+
+        String errorMessage = String.format(
+                "{\"error\":\"계정이 정지되었습니다\",\"reason\":\"%s\"}",
+                sanctionReason
+        );
+
+        response.getWriter().write(errorMessage);
+        return;
+      } else {
+        log.error("BANNED 상태인데 제재 정보 없음: memId={}", memId);
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write("{\"error\":\"계정이 정지되었습니다\"}");
+        return;
+      }
+    }
 
     // 토큰 생성을 위한 권한 정보 추출
     Collection<? extends GrantedAuthority> authorities = authResult.getAuthorities();

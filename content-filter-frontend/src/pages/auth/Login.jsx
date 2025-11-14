@@ -35,11 +35,29 @@ const Login = () => {
       nav('/');
     })
     .catch(e => {
-      if(e.status === 401){
-        alert('로그인 실패');
-      } else {
+      if (e.status === 403){
+      // 제재된 사용자
+      const data = e.response.data;
+      
+      // JSON 객체면 reason 추출, 문자열이면 그대로
+      const message = typeof data === 'object' && data.reason
+        ? `계정이 정지되었습니다.\n${data.reason}`
+        : (data.error || data);
+        
+      alert(message);
+      } else if (e.status === 401) {
+        alert("로그인 실패");
+      } else if (e.response) {
+        // 서버가 응답했지만 오류 상태일 때
+        alert(e.response.data);
         console.log(e);
-      }
+      } else if (e.request) {
+        // 요청은 보냈지만 응답이 없을 때
+        alert("서버로부터 응답이 없습니다.");
+      } else {
+        // 요청 설정 중 오류 발생
+        alert("요청 중 오류 발생: " + e.message);
+      };
     });
   };
 
