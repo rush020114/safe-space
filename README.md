@@ -1181,27 +1181,11 @@ redis-cli
 
 ---
 
-## 📄 라이선스
-
-이 프로젝트는 개인 포트폴리오 목적으로 제작되었습니다.
-
----
-
 ## 👨‍💻 개발자
 
-**이름**: [Your Name]  
-**이메일**: [Your Email]  
-**GitHub**: [Your GitHub]  
-**블로그**: [Your Blog]
-
----
-
-## 📞 문의
-
-프로젝트에 대한 문의사항이나 피드백은 언제든 환영합니다!
-
-- 📧 Email: [your.email@example.com]
-- 💬 GitHub Issues: [Repository Issues Link]
+**이름**: [이승형]  
+**이메일**: [rush020114@gmail.com]  
+**블로그**: [[Your Blog](https://trusting-chamomile-aea.notion.site/29d9b2bb3b0780d8a89bc8c0c0c3c4f2?source=copy_link)]
 
 ---
 
@@ -1209,21 +1193,9 @@ redis-cli
 
 **"기술을 통해 더 나은 커뮤니케이션 환경을 만들다"**
 
-Made with ❤️ by [Your Name]
+Made with ❤️ by 이승형
 
 </div>
 ```
 
 ---
-
-## 🎉 완성! 
-
-**5개 Part 모두 끝났어!**
-
-### ✅ 수정 완료 체크리스트
-```
-✅ Part 1: 핵심 기능 수정 + 핵심 도전 과제 강화 + 아키텍처 수정
-✅ Part 2: API 명세 + 핵심 구현 코드 (1~3)
-✅ Part 3: 핵심 구현 코드 (4~7) + ERD + 주요 화면
-✅ Part 4: 실행 방법 + 테스트 + 기술적 의사결정
-✅ Part 5: 배운 점 + 향후 개선 + 개발자 정보
