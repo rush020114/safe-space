@@ -24,7 +24,7 @@ public class PostDTO {
   @Schema(description = "게시글 내용", example = "이 게시글은 필터링 테스트용입니다.")
   private String postContent;
 
-  @Schema(description = "욕설 필터링 여부", example = "Y", allowableValues = {"Y", "N"})
+  @Schema(description = "욕설 필터링 여부", example = "N", allowableValues = {"Y", "N"})
   private String isFiltered;
 
   @Schema(description = "게시글 작성일시", example = "2025-11-15T11:00:00")

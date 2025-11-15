@@ -4,8 +4,10 @@ import com.safespace.content_filter_backend.domain.comment.dto.CommentDTO;
 import com.safespace.content_filter_backend.domain.comment.mapper.CommentMapper;
 import com.safespace.content_filter_backend.infra.filtering.ProfanityFilter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CommentService {
@@ -14,6 +16,7 @@ public class CommentService {
 
   // 댓글 등록
   public void regComment(CommentDTO commentDTO){
+    log.info("commentDTO : {}", commentDTO);
     String content = commentDTO.getCmtContent();
 
     // 댓글이 없다면

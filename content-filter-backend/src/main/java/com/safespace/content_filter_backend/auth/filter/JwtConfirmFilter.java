@@ -35,11 +35,16 @@ public class JwtConfirmFilter extends OncePerRequestFilter {
     if(SecurityContextHolder.getContext().getAuthentication() == null){
       String token = null;
 
+
       // 헤더에서 토큰 찾기
       String authorization = request.getHeader("Authorization");
+      log.info("Authorization 헤더 원본 값: {}", authorization);
+
       if(authorization != null && authorization.startsWith("Bearer ")){
         log.info("헤더의 토큰 추출 완료");
         token = authorization.split(" ")[1];
+        log.debug("추출된 토큰 값: {}", token);
+
       }
 
       // SSE의 url에서 토큰 찾기

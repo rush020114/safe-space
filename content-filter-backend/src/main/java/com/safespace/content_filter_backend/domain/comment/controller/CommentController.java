@@ -5,7 +5,6 @@ import com.safespace.content_filter_backend.domain.comment.dto.CommentDTO;
 import com.safespace.content_filter_backend.domain.comment.service.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,7 +36,7 @@ public class CommentController {
   @PostMapping("")
   @PreAuthorize("isAuthenticated()")
   public ResponseEntity<?> regComment(
-          @RequestBody(description = "댓글 정보 DTO") CommentDTO commentDTO,
+          @RequestBody CommentDTO commentDTO,
           @Parameter(description = "JWT 토큰 (Bearer {token})", example = "Bearer ...")
           @RequestHeader("Authorization") String token
   ){

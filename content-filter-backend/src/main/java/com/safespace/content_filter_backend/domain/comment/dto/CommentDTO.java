@@ -23,7 +23,7 @@ public class CommentDTO {
   @Schema(description = "댓글 작성일시", example = "2025-11-15T12:00:00")
   private LocalDateTime createdAt;
 
-  @Schema(description = "욕설 필터링 여부", example = "Y", allowableValues = {"Y", "N"})
+  @Schema(description = "욕설 필터링 여부", example = "N", allowableValues = {"Y", "N"})
   private String isFiltered;
 
   @Schema(description = "댓글이 속한 게시글 ID", example = "101")

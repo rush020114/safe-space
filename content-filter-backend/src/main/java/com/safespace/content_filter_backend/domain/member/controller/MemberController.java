@@ -1,11 +1,15 @@
 package com.safespace.content_filter_backend.domain.member.controller;
 
+import com.safespace.content_filter_backend.auth.util.JwtUtil;
 import com.safespace.content_filter_backend.domain.member.dto.MemberDTO;
 import com.safespace.content_filter_backend.domain.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/members")
 public class MemberController {
   private final MemberService memberService;
+  private final JwtUtil jwtUtil;
 
   @Operation(summary = "회원가입", description = "사용자가 이메일, 비밀번호 등으로 회원가입을 진행합니다.")
   @ApiResponses({
