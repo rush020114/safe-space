@@ -80,7 +80,8 @@ public class SecurityConfig {
 
     // 인증 정보를 포함한 요청(cookie, JWT 등)을 허용
     corsConfiguration.setAllowCredentials(true);
-    corsConfiguration.addAllowedOrigin("http://localhost:5173"); // react 요청 허용
+    corsConfiguration.addAllowedOrigin("http://localhost:5173");
+    corsConfiguration.addAllowedOrigin("http://192.168.45.227:5173");
     corsConfiguration.addAllowedHeader("*"); // 모든 헤더 정보 허용
     corsConfiguration.addAllowedMethod("*"); // get, post, delete, put 등의 요청 허용
 
