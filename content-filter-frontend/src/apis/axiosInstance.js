@@ -1,8 +1,9 @@
 import axios from "axios";
+import { SERVER_URL } from "../constants/appConst";
 
 // axios 대신 사용 시 해당 설정을 유지해준다.
 export const axiosInstance = axios.create({
-  baseURL: "http://localhost:8080" // 백엔드 주소
+  baseURL: `${SERVER_URL}` // 백엔드 주소
   , withCredentials: true // 필요 시 쿠키 인증도 함께 처리하기 위한 설정
 });
 
