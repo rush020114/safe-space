@@ -76,7 +76,7 @@ public class ReportService {
       // 신고 상태 처리
       int update = reportMapper.handleReport(reportDTO);
       if(update == 0)
-        throw new IllegalArgumentException("이미 처리된 신고입니다.");
+        throw new RuntimeException("이미 처리된 신고입니다.");
 
       // 신고 대상 정보 추출
       int targetMemId = isPost
@@ -167,7 +167,7 @@ public class ReportService {
       reportMapper.handleReport(reportDTO);
 
     } else {
-      throw new IllegalArgumentException("처리 가능한 신고 상태는 APPROVED 또는 REJECTED입니다. 현재 상태: " + status);
+      throw new RuntimeException("처리 가능한 신고 상태는 APPROVED 또는 REJECTED입니다. 현재 상태: " + status);
     }
   }
 }

@@ -46,6 +46,7 @@ const Login = () => {
         
       alert(message);
       } else if (e.status === 401) {
+        console.log(e)
         alert("로그인 실패");
       } else if (e.response) {
         // 서버가 응답했지만 오류 상태일 때

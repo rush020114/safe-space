@@ -67,7 +67,7 @@ public class AdminReportController {
       return ResponseEntity
               .status(HttpStatus.OK)
               .body(reportService.getReportListForAdmin(targetType));
-    } catch (IllegalArgumentException e) {
+    } catch (RuntimeException e) {
       log.info("신고 목록 조회 실패 - 타입 불일치 : {}", e.getMessage());
       return ResponseEntity
               .status(HttpStatus.BAD_REQUEST)
@@ -106,7 +106,7 @@ public class AdminReportController {
       return ResponseEntity
               .status(HttpStatus.OK)
               .body("신고 처리 완료" + reportDTO.getReportStatus());
-    } catch (IllegalArgumentException e){
+    } catch (RuntimeException e){
       log.info("신고 처리 실패 - 타입 불일치 : {}", e.getMessage());
       return ResponseEntity
               .status(HttpStatus.BAD_REQUEST)
