@@ -28,7 +28,7 @@ const PostReportListComponent = ({ PostReportList, processReport }) => {
               </Card.Title>
               <Card.Text>
                 <strong>신고 사유:</strong> {postReport.reportReason}<br />
-                <strong>작성자:</strong> user3<br />
+                <strong>작성자:</strong> {postReport.memId}<br />
                 <strong>신고일:</strong> {dayjs(postReport.createdAt).format('YYYY-MM-DD HH:mm:ss')}
               </Card.Text>
             </Card.Body>
