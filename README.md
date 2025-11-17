@@ -823,7 +823,7 @@ public enum ReportTargetType {
 ## 🗄️ 데이터베이스 설계
 
 ### ERD
-> 📸 **이미지 위치**: `images/erd.png`
+![ERD](images/safespace_ERD.png)
 
 ### Redis 데이터 구조
 ```
@@ -843,7 +843,7 @@ TTL: 24시간
 ## 🎬 주요 화면
 
 ### 1️⃣ 욕설 필터링 동작
-> 📸 **이미지/GIF 위치**: `images/profanity_filter.gif`
+![ERD](images/욕설_필터링.png)
 
 **동작 과정**
 1. 사용자가 욕설이 포함된 게시글/댓글 작성 시도
@@ -853,7 +853,6 @@ TTL: 24시간
 ---
 
 ### 2️⃣ 사용자 신고 플로우
-> 📸 **이미지/GIF 위치**: `images/report_flow.gif`
 
 **동작 과정**
 1. 사용자가 부적절한 게시글/댓글 발견
@@ -864,7 +863,7 @@ TTL: 24시간
 ---
 
 ### 3️⃣ 관리자 실시간 알림
-> 📸 **이미지/GIF 위치**: `images/admin_notification.gif`
+![ERD](images/신고_실시간.png)
 
 **주요 기능**
 - 💬 실시간 신고 알림 수신
@@ -874,7 +873,6 @@ TTL: 24시간
 ---
 
 ### 4️⃣ 단계적 제재 적용
-> 📸 **이미지/GIF 위치**: `images/sanction_flow.gif`
 
 **제재 흐름**
 1. 관리자가 신고 승인
@@ -886,7 +884,7 @@ TTL: 24시간
 ---
 
 ### 5️⃣ 제재 상태 확인
-> 📸 **이미지/GIF 위치**: `images/ban_check.gif`
+![ERD](images/사용자_제재.png)
 
 **로그인 차단 화면**
 - 제재 사유 표시
