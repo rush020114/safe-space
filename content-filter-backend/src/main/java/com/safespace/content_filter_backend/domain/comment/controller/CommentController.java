@@ -40,25 +40,13 @@ public class CommentController {
           @Parameter(description = "JWT 토큰 (Bearer {token})", example = "Bearer ...")
           @RequestHeader("Authorization") String token
   ){
-    try {
-      String jwt = token.replace("Bearer ", "");
-      log.info("comment jwt 토큰 : {}", jwt);
-      commentDTO.setMemId(jwtUtil.getMemIdFromToken(jwt));
-      commentService.regComment(commentDTO);
-      return ResponseEntity
-              .status(HttpStatus.CREATED)
-              .body("댓글 등록 성공");
-    } catch (RuntimeException e){
-      log.info("댓글 등록 실패 - 입력 오류 : {}", e.getMessage());
-      return ResponseEntity
-              .status(HttpStatus.BAD_REQUEST)
-              .body(e.getMessage());
-    } catch (Exception e){
-      log.info("댓글 등록 실패 - 서버 오류", e);
-      return ResponseEntity
-              .status(HttpStatus.INTERNAL_SERVER_ERROR)
-              .body(e.getMessage());
-    }
+    String jwt = token.replace("Bearer ", "");
+    log.info("comment jwt 토큰 : {}", jwt);
+    commentDTO.setMemId(jwtUtil.getMemIdFromToken(jwt));
+    commentService.regComment(commentDTO);
+    return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body("댓글 등록 성공");
   }
 
 }

@@ -63,21 +63,9 @@ public class AdminReportController {
   @GetMapping("/{targetType}")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<?> getReportListForAdmin(@PathVariable("targetType") String targetType){
-    try {
-      return ResponseEntity
-              .status(HttpStatus.OK)
-              .body(reportService.getReportListForAdmin(targetType));
-    } catch (RuntimeException e) {
-      log.info("신고 목록 조회 실패 - 타입 불일치 : {}", e.getMessage());
-      return ResponseEntity
-              .status(HttpStatus.BAD_REQUEST)
-              .body(e.getMessage());
-    } catch (Exception e) {
-      log.info("신고 목록 조회 실패 - 서버 오류", e);
-      return ResponseEntity
-              .status(HttpStatus.INTERNAL_SERVER_ERROR)
-              .body("신고 목록 조회 중 서버 오류 발생");
-    }
+    return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(reportService.getReportListForAdmin(targetType));
   }
 
   // 신고 처리
@@ -99,24 +87,12 @@ public class AdminReportController {
           , @RequestBody ReportDTO reportDTO
           , @AuthenticationPrincipal CustomUserDetails user
           ) {
-    try {
-      int adminId = user.getUserId();
-      reportDTO.setReportId(reportId);
-      reportService.handleReport(reportDTO, adminId);
-      return ResponseEntity
-              .status(HttpStatus.OK)
-              .body("신고 처리 완료" + reportDTO.getReportStatus());
-    } catch (RuntimeException e){
-      log.info("신고 처리 실패 - 타입 불일치 : {}", e.getMessage());
-      return ResponseEntity
-              .status(HttpStatus.BAD_REQUEST)
-              .body(e.getMessage());
-    } catch (Exception e) {
-      log.info("신고 처리 실패 - 서버 오류", e);
-      return ResponseEntity
-              .status(HttpStatus.INTERNAL_SERVER_ERROR)
-              .body("신고 처리 중 서버 오류 발생");
-    }
+    int adminId = user.getUserId();
+    reportDTO.setReportId(reportId);
+    reportService.handleReport(reportDTO, adminId);
+    return ResponseEntity
+            .status(HttpStatus.OK)
+            .body("신고 처리 완료" + reportDTO.getReportStatus());
   }
 
 }

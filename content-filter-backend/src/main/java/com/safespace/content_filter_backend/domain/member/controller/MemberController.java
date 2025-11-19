@@ -36,23 +36,11 @@ public class MemberController {
           @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "회원가입 정보")
           @RequestBody MemberDTO memberDTO
   ){
-    try {
-      memberService.regMember(memberDTO);
-      log.info("회원가입 성공 - 이메일 : {}", memberDTO.getMemEmail());
-      return ResponseEntity
-              .status(HttpStatus.CREATED)
-              .body("회원가입 성공");
-    } catch (RuntimeException e) {
-      log.info("회원가입 실패 - 입력 오류 : {}", e.getMessage());
-      return ResponseEntity
-              .status(HttpStatus.BAD_REQUEST)
-              .body(e.getMessage());
-    } catch (Exception e) {
-      log.info("회원가입 실패 - 서버 오류", e);
-      return ResponseEntity
-              .status(HttpStatus.INTERNAL_SERVER_ERROR)
-              .body("회원가입 중 서버 오류 발생");
-    }
+    memberService.regMember(memberDTO);
+    log.info("회원가입 성공 - 이메일 : {}", memberDTO.getMemEmail());
+    return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body("회원가입 성공");
   }
 
 }

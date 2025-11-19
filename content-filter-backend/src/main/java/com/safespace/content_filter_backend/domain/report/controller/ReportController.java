@@ -42,26 +42,14 @@ public class ReportController {
           @Parameter(description = "JWT 인증 토큰", example = "Bearer ...")
           @RequestHeader("Authorization") String token
   ){
-    try {
-      String jwt = token.replace("Bearer ", "");
-      reportDTO.setReporterId(jwtUtil.getMemIdFromToken(jwt));
-      log.info("report jwt 토큰 : {}", jwt);
+    String jwt = token.replace("Bearer ", "");
+    reportDTO.setReporterId(jwtUtil.getMemIdFromToken(jwt));
+    log.info("report jwt 토큰 : {}", jwt);
 
-      // 신고 등록
-      reportService.regReport(reportDTO);
-      return ResponseEntity
-              .status(HttpStatus.CREATED)
-              .body("신고 접수 완료");
-    } catch (RuntimeException e){
-      log.info("신고 등록 실패 - 입력 오류 : {}", e.getMessage());
-      return ResponseEntity
-              .status(HttpStatus.BAD_REQUEST)
-              .body(e.getMessage());
-    } catch (Exception e){
-      log.info("신고 등록 실패 - 서버 오류", e);
-      return ResponseEntity
-              .status(HttpStatus.INTERNAL_SERVER_ERROR)
-              .body(e.getMessage());
-    }
+    // 신고 등록
+    reportService.regReport(reportDTO);
+    return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body("신고 접수 완료");
   }
 }

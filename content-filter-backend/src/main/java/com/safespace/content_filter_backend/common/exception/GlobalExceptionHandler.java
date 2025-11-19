@@ -1,5 +1,6 @@
 package com.safespace.content_filter_backend.common.exception;
 
+import com.safespace.content_filter_backend.infra.exception.ContentFilterException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,15 @@ public class GlobalExceptionHandler {
     return ResponseEntity
             .status(HttpStatus.UNAUTHORIZED)
             .body(e.getMessage());
+  }
+
+  // 욕설 필터링 서버 오류
+  @ExceptionHandler(ContentFilterException.class)
+  public ResponseEntity<String> handleContentFilterException(ContentFilterException e){
+    log.error("서버 오류로 욕설 필터링 실패: {}", e.getMessage());
+    return ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body("욕설 필터링 중 서버 오류가 발생했습니다.");
   }
 
   // 그 외 모든 예외 (서버 오류)

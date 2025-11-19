@@ -36,10 +36,10 @@ public class PostService {
       throw new RuntimeException("내용을 입력해주세요");
 
     // 욕설 판단
-    if (profanityFilter.containsProfanity(title))
+    if (profanityFilter.containsProfanityHybrid(title))
       throw new RuntimeException("제목에 부적절한 단어가 포함되어 있습니다.");
 
-    if(profanityFilter.containsProfanity(content)){
+    if(profanityFilter.containsProfanityHybrid(content)){
       throw new RuntimeException("내용에 부적절한 단어가 포함되어 있습니다.");
     }
 

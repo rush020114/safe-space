@@ -24,10 +24,12 @@ public class ProfanityFilter {
   );
 
   private final Pattern profanityPattern;
+  private final OpenAIModerationService aiService;
 
-  public ProfanityFilter() {
+  public ProfanityFilter(OpenAIModerationService aiService) {
     String regex = String.join("|", PROFANITY_LIST);
     this.profanityPattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+    this.aiService = aiService;
   }
 
   // 욕설 정규화
@@ -38,10 +40,28 @@ public class ProfanityFilter {
   }
 
   // 욕설 포함 여부 확인
-  public boolean containsProfanity (String input){
+  private boolean containsProfanity (String input){
     String cleaned = preprocess(input);
     log.info("욕설 확인 : {}", input);
 
     return profanityPattern.matcher(cleaned).find();
+  }
+
+  /**
+   * 하이브리드 필터링: 로컬 + AI
+   */
+  public boolean containsProfanityHybrid(String input){
+    // 1단계: 빠른 로컬 검사
+    if(containsProfanity(input)){
+      log.info("로컬 필터로 차단: {}", input);
+      return true;
+    }
+
+    if(input.length() > 20){
+      log.info("AI 필터로 추가 검사");
+      return aiService.isProfanity(input);
+    }
+
+    return false;
   }
 }

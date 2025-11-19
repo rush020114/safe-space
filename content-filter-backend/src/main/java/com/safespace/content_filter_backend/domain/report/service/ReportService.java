@@ -1,9 +1,11 @@
 package com.safespace.content_filter_backend.domain.report.service;
 
 import com.safespace.content_filter_backend.domain.admin.service.SseEmitterService;
+import com.safespace.content_filter_backend.domain.comment.dto.CommentDTO;
 import com.safespace.content_filter_backend.domain.comment.mapper.CommentMapper;
 import com.safespace.content_filter_backend.domain.member.dto.MemberDTO;
 import com.safespace.content_filter_backend.domain.member.mapper.MemberMapper;
+import com.safespace.content_filter_backend.domain.post.dto.PostDTO;
 import com.safespace.content_filter_backend.domain.post.mapper.PostMapper;
 import com.safespace.content_filter_backend.domain.report.dto.ReportDTO;
 import com.safespace.content_filter_backend.domain.report.mapper.ReportMapper;
@@ -11,7 +13,9 @@ import com.safespace.content_filter_backend.domain.report.model.ReportStatus;
 import com.safespace.content_filter_backend.domain.report.model.ReportTargetType;
 import com.safespace.content_filter_backend.domain.sanction.dto.SanctionDTO;
 import com.safespace.content_filter_backend.domain.sanction.mapper.SanctionMapper;
+import com.safespace.content_filter_backend.domain.sanction.service.SanctionService;
 import com.safespace.content_filter_backend.infra.redis.RedisService;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -33,6 +37,7 @@ public class ReportService {
   private final SanctionMapper sanctionMapper;
   private final SseEmitterService sseEmitterService;
   private final RedisService redisService;
+  private final SanctionService sanctionService;
 
   // 신고 등록
   public void regReport(ReportDTO reportDTO){
@@ -66,108 +71,75 @@ public class ReportService {
   public void handleReport(ReportDTO reportDTO, int adminId) {
 
     String status = ReportStatus.from(reportDTO.getReportStatus()).name();
-    String type = ReportTargetType.from(reportDTO.getTargetType()).name();
 
-    boolean isApproved = status.equals("APPROVED");
-    boolean isRejected = status.equals("REJECTED");
-    boolean isPost = type.equals("POST");
-
-    if (isApproved) {
-      // 신고 상태 처리
-      int update = reportMapper.handleReport(reportDTO);
-      if(update == 0)
-        throw new RuntimeException("이미 처리된 신고입니다.");
-
-      // 신고 대상 정보 추출
-      int targetMemId = isPost
-              ? reportDTO.getPostDTO().getMemId()
-              : reportDTO.getCommentDTO().getMemId();
-
-      int targetContentId = isPost
-              ? reportDTO.getPostDTO().getPostId()
-              : reportDTO.getCommentDTO().getCmtId();
-
-      // 회원 상태 처리
-      memberMapper.addWarningCnt(targetMemId);
-
-      // 콘텐츠 필터링 처리
-      if (isPost) {
-        postMapper.filterPost(targetContentId);
-      } else {
-        commentMapper.filterComment(targetContentId);
-      }
-
-      // 회원 신고된 횟수 조회
-      int warningCnt = memberMapper.getMemberStatusById(targetMemId).getWarningCnt();
-      SanctionDTO sanctionDTO = new SanctionDTO();
-      LocalDateTime bannedUntil = null;
-      String sanctionType = null;
-      String sanctionReason = null;
-
-      if (warningCnt >= 9) {
-        bannedUntil = LocalDateTime.of(2099, 12, 31, 23, 59);
-        String bannedUntilStr = bannedUntil.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-
-        sanctionType = "BAN_PERMANENT";
-        sanctionReason = "신고 9회 누적으로 영구 정지";
-
-        sanctionDTO.setSanctionType(sanctionType);
-        sanctionDTO.setSanctionReason(sanctionReason);
-        sanctionDTO.setMemId(targetMemId);
-        sanctionDTO.setAdminId(adminId);
-        sanctionMapper.regSanction(sanctionDTO);
-        memberMapper.banMember(bannedUntilStr, targetMemId);
-
-        // Redis 업데이트
-        redisService.updateMemberStatus(targetMemId, "BANNED", bannedUntil, sanctionType, sanctionReason);
-
-      } else if (warningCnt == 6) {
-        bannedUntil = LocalDateTime.now().plusMinutes(3);
-        String bannedUntilStr = bannedUntil.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        sanctionType = "BAN_TEMP_2";
-        sanctionReason = "신고 6회 누적으로 " + bannedUntil + "까지 정지";
-
-        sanctionDTO.setSanctionType(sanctionType);
-        sanctionDTO.setSanctionReason(sanctionReason);
-        sanctionDTO.setEndDate(bannedUntil);
-        sanctionDTO.setMemId(targetMemId);
-        sanctionDTO.setAdminId(adminId);
-        sanctionMapper.regSanction(sanctionDTO);
-        memberMapper.banMember(bannedUntilStr, targetMemId);
-
-        // Redis 업데이트
-        redisService.updateMemberStatus(targetMemId, "BANNED", bannedUntil, sanctionType, sanctionReason);
-
-      } else if (warningCnt == 3) {
-        bannedUntil = LocalDateTime.now().plusMinutes(1);
-        String bannedUntilStr = bannedUntil.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        sanctionType = "BAN_TEMP_1";
-        sanctionReason = "신고 3회 누적으로 " + bannedUntil + "까지 정지";
-
-        sanctionDTO.setSanctionType(sanctionType);
-        sanctionDTO.setSanctionReason(sanctionReason);
-        sanctionDTO.setEndDate(bannedUntil);
-        sanctionDTO.setMemId(targetMemId);
-        sanctionDTO.setAdminId(adminId);
-        sanctionMapper.regSanction(sanctionDTO);
-        memberMapper.banMember(bannedUntilStr, targetMemId);
-
-        // Redis 업데이트
-        redisService.updateMemberStatus(targetMemId, "BANNED", bannedUntil, sanctionType, sanctionReason);
-
-      } else {
-        log.info("경고 {}회 - 제재 없음 (콘텐츠 필터링만)", warningCnt);
-
-        // Redis 경고 횟수 업데이트
-        MemberDTO updated = memberMapper.getMemberStatusById(targetMemId);
-        redisService.cacheMemberSanctionInfo(targetMemId, updated);
-      }
-    } else if (isRejected) {
-      // 신고 상태 처리
-      reportMapper.handleReport(reportDTO);
-
+    if (status.equals("APPROVED")) {
+      approveReport(reportDTO, adminId);
+    } else if (status.equals("REJECTED")) {
+      rejectReport(reportDTO);
     } else {
       throw new RuntimeException("처리 가능한 신고 상태는 APPROVED 또는 REJECTED입니다. 현재 상태: " + status);
     }
+  }
+
+  // 신고 승인
+  private void approveReport(ReportDTO reportDTO, int adminId){
+    updateReportStatus(reportDTO);
+    ReportTarget target = extractTarget(reportDTO);
+    applyWarningAndFilter(target);
+
+    // 제재 로직 분리
+    sanctionService.applySanctionIfNeeded(target.memId, adminId);
+  }
+
+  // 신고 반려
+  private void rejectReport (ReportDTO reportDTO){
+    reportMapper.handleReport(reportDTO);
+  }
+
+  // 신고 상태 업데이트
+  private void updateReportStatus (ReportDTO reportDTO){
+    int updated = reportMapper.handleReport(reportDTO);
+    if(updated == 0){
+      throw new RuntimeException("이미 처리된 신고입니다.");
+    }
+  }
+
+  // 게시글/댓글 판별 함수
+  private ReportTarget extractTarget(ReportDTO reportDTO){
+    String type = ReportTargetType.from(reportDTO.getTargetType()).name();
+    boolean isPost = type.equals("POST");
+
+    if(isPost){
+      PostDTO postDTO = reportDTO.getPostDTO();
+      return new ReportTarget(postDTO.getMemId(), postDTO.getPostId(), true);
+    } else {
+      CommentDTO commentDTO = reportDTO.getCommentDTO();
+      return new ReportTarget(commentDTO.getMemId(), commentDTO.getCmtId(), false);
+    }
+  }
+
+  // 경고 횟수 증가 및 필터링
+  private void applyWarningAndFilter(ReportTarget reportTarget){
+    memberMapper.addWarningCnt(reportTarget.memId);
+
+    if(reportTarget.isPost){
+      postMapper.filterPost(reportTarget.contentId);
+    } else {
+      commentMapper.filterComment(reportTarget.contentId);
+    }
+  }
+
+  // static nested 클래스
+  // static은 Outer 클래스의 자리를 잠시 빌려 쓴다 생각하고 그 클래스와 아무 상관 없다고 보는 것이 이해가 편하다.
+  // 그러므로 자신을 감싸는 외부 클래스의 인스턴스와 상관 없이 static nested 클래스의 인스턴스 생성이 가능하다.
+  // 인스턴스 생성 문법 : 외부클래스.static nested 클래스명 = new 외부클래스.static nested 클래스명();
+  // outer 클래스 안의 static끼리는 서로 자원을 공유한다.(static nested 클래스 안의 메서드는 static 멤버변수를 사용할 수 있다.)
+  // 단순한 분기 + 상태 전달이 필요한 상황에서는
+  // static nested class로 응집력 있게 묶는 방식이 가장 실용적이고 유지보수에 강한 구조
+  @AllArgsConstructor
+  private static class ReportTarget{
+    int memId;
+    int contentId;
+    boolean isPost;
   }
 }

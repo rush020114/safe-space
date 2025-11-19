@@ -25,7 +25,7 @@ public class CommentService {
     }
 
     // 댓글 필터링
-    if(profanityFilter.containsProfanity(content)){
+    if(profanityFilter.containsProfanityHybrid(content)){
       throw new RuntimeException("부적절한 단어가 포함되어 있습니다");
     }
 
