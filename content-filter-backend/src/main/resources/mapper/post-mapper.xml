@@ -52,7 +52,7 @@
 
     <!-- 게시글 번호 조회 -->
     <select id="getPostId">
-        SELECT IFNULL(MAX(POST_ID), 0) + 1
+        SELECT COALESCE(MAX(POST_ID), 0) + 1
         FROM POST
     </select>
 

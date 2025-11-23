@@ -33,9 +33,9 @@ public class SanctionService {
     if (warningCnt >= 9) {
       applyPermanentBan(memId, adminId);
     } else if (warningCnt == 6) {
-      applyTempBan(memId, adminId, 3, "BAN_TEMP_2");
+      applyTempBan(memId, adminId, 3, "BAN_TEMP_2", warningCnt);
     } else if (warningCnt == 3) {
-      applyTempBan(memId, adminId, 1, "BAN_TEMP_1");
+      applyTempBan(memId, adminId, 1, "BAN_TEMP_1", warningCnt);
     } else {
       updateWarningOnly(memId);
     }
@@ -50,9 +50,11 @@ public class SanctionService {
   }
 
   // 임시 정지
-  private void applyTempBan(int memId, int adminId, int minutes, String sanctionType) {
+  private void applyTempBan(int memId, int adminId, int minutes, String sanctionType, int warningCnt) {
     LocalDateTime bannedUntil = LocalDateTime.now().plusMinutes(minutes);
-    String reason = String.format("신고 누적으로 %s까지 정지", bannedUntil);
+    String reason = String.format("신고 %d회 누적으로 %s까지 정지",
+            warningCnt,
+            bannedUntil.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
 
     banMember(memId, adminId, sanctionType, reason, bannedUntil, bannedUntil);
   }

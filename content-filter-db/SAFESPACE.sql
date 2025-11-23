@@ -74,23 +74,3 @@ SELECT * FROM post_img;
 SELECT * FROM cmt;
 SELECT * FROM report;
 SELECT * FROM sanction;
-
-SELECT M.BANNED_UNTIL,
-       S.SANCTION_REASON,
-       S.SANCTION_TYPE,
-       M.WARNING_CNT
-FROM MEMBER M
-LEFT JOIN (
-    SELECT SANCTION_REASON,
-           SANCTION_TYPE,
-           MEM_ID
-    FROM (
-        SELECT SANCTION_REASON,
-               SANCTION_TYPE,
-               MEM_ID,
-               ROW_NUMBER() OVER (PARTITION BY MEM_ID ORDER BY START_DATE DESC) AS rn
-        FROM SANCTION
-    ) T
-    WHERE T.rn = 1
-) S ON M.MEM_ID = S.MEM_ID
-WHERE M.MEM_ID = 2;
