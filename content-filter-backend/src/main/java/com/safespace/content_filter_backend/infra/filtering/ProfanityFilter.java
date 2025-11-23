@@ -36,8 +36,8 @@ public class ProfanityFilter {
   public String preprocess(String text) {
 
     return text
-            .replaceAll("\\s+", "")                  // 공백 제거
-            .toLowerCase();                          // 소문자 통일
+            .replaceAll("\\s+", "") // 공백 제거
+            .toLowerCase();         // 소문자 통일
   }
 
   // 욕설 포함 여부 확인
