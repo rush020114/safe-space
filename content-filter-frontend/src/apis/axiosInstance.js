@@ -10,7 +10,7 @@ export const axiosInstance = axios.create({
   , headers: {
     "Content-Type": "application/json",
   },
-});
+}); 
 
 // 모든 요청 전 헤더에 토큰을 담는 코드
 axiosInstance.interceptors.request.use(
