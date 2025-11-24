@@ -5,6 +5,7 @@ import com.safespace.content_filter_backend.auth.filter.LoginFilter;
 import com.safespace.content_filter_backend.auth.util.JwtUtil;
 import com.safespace.content_filter_backend.infra.redis.RedisService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -23,6 +24,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
+
 // spring security 의존성 주입으로 api호출이 되지 않는다.
 // 인증받지 않은 사용자를 막고 있기 때문에
 // 설정 파일을 만들어 각 api마다 접근할 수 있는 인증/인가에 대한 설정이 필요하다.
@@ -33,6 +36,11 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
   private final JwtUtil jwtUtil;
   private final RedisService redisService;
+
+  // 환경변수로 허용할 Origin들을 받아옴
+  @Value("${cors.allowed.origins}")
+  private String allowedOrigins;
+
   // spring security에서 http 요청에 대한 보안 설정을 정의하는 메서드
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity httpSecurity, AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -80,8 +88,9 @@ public class SecurityConfig {
 
     // 인증 정보를 포함한 요청(cookie, JWT 등)을 허용
     corsConfiguration.setAllowCredentials(true);
-    corsConfiguration.addAllowedOrigin("http://localhost:5173");
-    corsConfiguration.addAllowedOrigin("http://192.168.45.227:5173");
+    // 환경변수에서 받은 Origins를 쉼표로 분리해서 모두 허용
+    Arrays.stream(allowedOrigins.split(","))
+            .forEach(corsConfiguration::addAllowedOrigin);
     corsConfiguration.addAllowedHeader("*"); // 모든 헤더 정보 허용
     corsConfiguration.addAllowedMethod("*"); // get, post, delete, put 등의 요청 허용
 
