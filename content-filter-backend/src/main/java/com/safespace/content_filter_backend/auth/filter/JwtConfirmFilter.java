@@ -31,6 +31,13 @@ public class JwtConfirmFilter extends OncePerRequestFilter {
   protected void doFilterInternal (HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
     log.info("JwtConfirmFilter - doFilerInternal() 메서드 실행");
 
+    // 브라우저가 CORS Preflight 요청을 보낼 때 사용하는 OPTIONS 메서드 처리
+    // JWT 인증 등 추가 검증을 거치지 않고 바로 다음 필터로 넘겨 허용해야 함
+    if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+      filterChain.doFilter(request, response);
+      return;
+    }
+
     // 인증 정보가 없으면
     if(SecurityContextHolder.getContext().getAuthentication() == null){
       String token = null;
