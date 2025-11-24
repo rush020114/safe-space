@@ -3,7 +3,6 @@ import { Container, ButtonGroup, Button } from 'react-bootstrap';
 import PostReportListComponent from './PostReportListComponent';
 import CommentReportListComponent from './CommentReportListComponent';
 import { axiosInstance } from '../../../apis/axiosInstance';
-import { SERVER_URL } from '../../../constants/appConst';
 import useAdminSSE from '../../../hooks/useAdminSSE';
 import { useSelector } from 'react-redux';
 
@@ -16,11 +15,11 @@ const AdminReportList = () => {
 
   // 초기 데이터 로딩
   useEffect(() => {
-    axiosInstance.get(`${SERVER_URL}/admin/reports/POST`)
+    axiosInstance.get(`/admin/reports/POST`)
       .then(res => setPostReportList(res.data))
       .catch(handleError);
 
-    axiosInstance.get(`${SERVER_URL}/admin/reports/COMMENT`)
+    axiosInstance.get(`/admin/reports/COMMENT`)
       .then(res => setCommentReportList(res.data))
       .catch(handleError);
   }, [reload]);
@@ -39,7 +38,7 @@ const AdminReportList = () => {
 
   // 신고 처리 함수
   const processReport = (reportProccessId, reportProcessData) => {
-    axiosInstance.put(`${SERVER_URL}/admin/reports/${reportProccessId}`, reportProcessData)
+    axiosInstance.put(`/admin/reports/${reportProccessId}`, reportProcessData)
       .then(res => {
         alert(res.data);
         

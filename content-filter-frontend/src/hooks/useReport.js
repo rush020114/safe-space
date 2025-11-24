@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { axiosInstance } from "../apis/axiosInstance";
-import { SERVER_URL } from "../constants/appConst";
 
 const useReport = (reporterId) => {
   const [reportTarget, setReportTarget] = useState({ type: "", id: null });
@@ -15,7 +14,7 @@ const useReport = (reporterId) => {
 
   const submitReport = async (reason) => {
     try{
-      const res = await axiosInstance.post(`${SERVER_URL}/reports`, {
+      const res = await axiosInstance.post(`/reports`, {
         targetType: reportTarget.type,
         targetId: reportTarget.id,
         reporterId,

@@ -1,12 +1,13 @@
   import { useEffect } from "react"
-  import { SERVER_URL } from "../constants/appConst"
+
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
   const useAdminSSE = ({token, onReport}) => {
     useEffect(() => {
       if(!token) return
 
       // sse 연결
-      const eventSource = new EventSource(`${SERVER_URL}/admin/reports/stream?token=${token}`);
+      const eventSource = new EventSource(`${API_URL}/admin/reports/stream?token=${token}`);
 
       // spring에서 보낸 더미 데이터 (create할 때)
       eventSource.addEventListener('connect', e => {

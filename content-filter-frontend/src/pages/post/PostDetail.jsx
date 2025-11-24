@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { axiosInstance } from '../../apis/axiosInstance';
-import { SERVER_URL } from '../../constants/appConst';
 import { Accordion, Alert, Button, Card, Container, Dropdown, Form } from 'react-bootstrap';
 import dayjs from 'dayjs';
 import { useSelector } from 'react-redux';
@@ -29,14 +28,14 @@ const PostDetail = () => {
 
   // 게시글 상세를 조회할 useEffect
   useEffect(() => {
-    axiosInstance.get(`${SERVER_URL}/posts/${postId}`)
+    axiosInstance.get(`/posts/${postId}`)
     .then(res => setPostDetail(res.data))
     .catch(e => console.log(e));
   }, [reload]);
   
   // 댓글을 등록할 함수
   const regComment = () => {
-    axiosInstance.post(`${SERVER_URL}/comments`, {
+    axiosInstance.post(`$/comments`, {
       cmtContent: comment
       , postId
     })
@@ -71,7 +70,7 @@ const PostDetail = () => {
       {postDetail?.postImgDTO?.attachedImgName && (
         <Card.Img
           variant="top"
-          src={`${SERVER_URL}/post/${postDetail.postImgDTO.attachedImgName}`}
+          src={`/post/${postDetail.postImgDTO.attachedImgName}`}
           alt="게시글 이미지"
           style={{
             objectFit: "contain",

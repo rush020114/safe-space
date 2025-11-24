@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Card, Container, Dropdown } from 'react-bootstrap'
 import { axiosInstance } from '../../apis/axiosInstance';
-import { SERVER_URL } from '../../constants/appConst';
 import dayjs from 'dayjs';
 import { useSelector } from 'react-redux';
 import { jwtDecode } from 'jwt-decode';
@@ -9,6 +8,8 @@ import { isAdmin, isAuthenticated } from '../../apis/authCheck';
 import { useNavigate } from 'react-router-dom';
 import ReportModal from '../../components/modal/ReportModal';
 import useReport from '../../hooks/useReport';
+
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 const PostList = () => {
   const token = useSelector(state => state.auth.token);
@@ -24,7 +25,7 @@ const PostList = () => {
 
   // 게시글 목록을 세팅할 useEffect
   useEffect(() => {
-    axiosInstance.get(`${SERVER_URL}/posts`)
+    axiosInstance.get(`/posts`)
     .then(res => setPostList(res.data))
     .catch(e => console.log(e));
   }, []);
@@ -44,7 +45,7 @@ const PostList = () => {
             {post.postImgDTO.attachedImgName !== null && (
               <Card.Img
                 variant="top"
-                src={`${SERVER_URL}/post/${post.postImgDTO.attachedImgName}`}
+                src={`${API_URL}/post/${post.postImgDTO.attachedImgName}`}
                 alt="게시글 이미지"
                 style={{
                   padding: "10px",
