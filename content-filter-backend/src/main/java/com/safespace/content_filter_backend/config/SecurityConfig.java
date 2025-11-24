@@ -49,7 +49,7 @@ public class SecurityConfig {
 
     httpSecurity
             // cors설정. 아래 corsConfigurationSource() 메서드에서 정의한 Bean을 등록.
-            .cors(Customizer.withDefaults())
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             // 세션을 사용하지 않는 JWT 기반 인증이므로 CSRF 보호는 불필요
             .csrf(csrf -> csrf.disable())
             // form로그인 방식을 쓰지 않고 api 처리 방식이기 떄문에 설정 필요 없음.
