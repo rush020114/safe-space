@@ -66,3 +66,22 @@ CREATE TABLE SANCTION (
 	, FOREIGN KEY (MEM_ID) REFERENCES MEMBER (MEM_ID)
 	, FOREIGN KEY (ADMIN_ID) REFERENCES MEMBER (MEM_ID)
 );
+
+-- 회원 전체 조회
+SELECT * FROM MEMBER;
+
+-- 게시글 전체 조회
+SELECT * FROM POST;
+
+-- 게시글 이미지 전체 조회
+SELECT * FROM POST_IMG;
+
+-- 댓글 전체 조회
+SELECT * FROM CMT;
+
+-- 신고 전체 조회
+SELECT * FROM REPORT;
+
+-- 제재 전체 조회
+SELECT * FROM SANCTION;
+
