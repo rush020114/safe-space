@@ -15,7 +15,7 @@
 
     <!-- 댓글 등록  -->
     <insert id="regComment">
-        INSERT INTO CMT (
+        INSERT INTO cmt (
             CMT_CONTENT
             , POST_ID
             , MEM_ID
@@ -28,7 +28,7 @@
 
     <!-- 댓글 필터링 -->
     <update id="filterComment">
-        UPDATE CMT
+        UPDATE cmt
         SET IS_FILTERED = 'Y'
         WHERE CMT_ID = #{cmtId}
     </update>

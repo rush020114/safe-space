@@ -16,7 +16,7 @@
 
     <!-- 제재 등록 -->
     <insert id="regSanction">
-        INSERT INTO SANCTION (
+        INSERT INTO sanction (
             SANCTION_TYPE
             , SANCTION_REASON
             , START_DATE

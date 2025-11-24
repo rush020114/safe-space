@@ -24,13 +24,13 @@
             , MEM_PW
             , MEM_ROLE
             , MEM_NAME
-        FROM MEMBER
+        FROM member
         WHERE MEM_EMAIL = #{memEmail}
     </select>
 
     <!-- 회원가입 -->
     <insert id="regMember">
-        INSERT INTO MEMBER (
+        INSERT INTO member (
             MEM_EMAIL
             , MEM_PW
             , MEM_NAME
@@ -44,20 +44,20 @@
     <!-- 이메일 중복 조회 -->
     <select id="countByEmail" resultType="int">
         SELECT COUNT(*)
-        FROM MEMBER
+        FROM member
         WHERE MEM_EMAIL = #{memEmail}
     </select>
     
     <!-- 회원 경고 횟수 증가 -->
     <update id="addWarningCnt">
-        UPDATE MEMBER
+        UPDATE member
         SET WARNING_CNT = WARNING_CNT + 1
         WHERE MEM_ID = #{reportedId};
     </update>
 
     <!-- 회원 제재 -->
     <update id="banMember">
-        UPDATE MEMBER
+        UPDATE member
         SET MEM_STATUS = CASE
         WHEN WARNING_CNT >= 9 THEN 'BANNED'
         WHEN WARNING_CNT % 3 = 0 THEN 'BANNED'
@@ -73,7 +73,7 @@
             , M.WARNING_CNT
             , S.SANCTION_REASON
             , S.SANCTION_TYPE
-        FROM MEMBER M
+        FROM member M
         LEFT JOIN (
             SELECT SANCTION_REASON
                 , SANCTION_TYPE
@@ -83,7 +83,7 @@
                     , SANCTION_TYPE
                     , MEM_ID
                     , ROW_NUMBER() OVER (PARTITION BY MEM_ID ORDER BY START_DATE DESC) AS rn
-                FROM SANCTION
+                FROM sanction
             ) T
             WHERE T.rn = 1
         ) S ON M.MEM_ID = S.MEM_ID
@@ -95,7 +95,7 @@
         SELECT MEM_ID
         , MEM_STATUS
         , BANNED_UNTIL
-        FROM MEMBER
+        FROM member
         WHERE MEM_STATUS = 'BANNED'
         AND BANNED_UNTIL IS NOT NULL
         AND BANNED_UNTIL &lt;= #{now}
@@ -103,7 +103,7 @@
 
     <!-- 회원 상태 업데이트 (정지 해제용) -->
     <update id="updateMemberStatus">
-        UPDATE MEMBER
+        UPDATE member
         SET MEM_STATUS = #{status}
             , BANNED_UNTIL = NULL
         WHERE MEM_ID = #{memId}

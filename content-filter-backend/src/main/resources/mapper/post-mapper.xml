@@ -24,7 +24,7 @@
 
     <!-- 게시글 등록 -->
     <insert id="regPost">
-        INSERT INTO POST (
+        INSERT INTO post (
             POST_ID
             , POST_TITLE
             , POST_CONTENT
@@ -39,7 +39,7 @@
 
     <!-- 게시글 이미지 등록 -->
     <insert id="regPostImg">
-        INSERT INTO POST_IMG (
+        INSERT INTO post_img (
             ORIGIN_IMG_NAME
             , ATTACHED_IMG_NAME
             , POST_ID
@@ -53,7 +53,7 @@
     <!-- 게시글 번호 조회 -->
     <select id="getPostId">
         SELECT COALESCE(MAX(POST_ID), 0) + 1
-        FROM POST
+        FROM post
     </select>
 
     <!-- 게시글 목록 조회 -->
@@ -65,8 +65,8 @@
             , MEM_ID
             , IMG_NUM
             , ATTACHED_IMG_NAME
-        FROM POST p
-        LEFT JOIN POST_IMG i
+        FROM post p
+        LEFT JOIN post_img i
         ON p.POST_ID = i.POST_ID
         WHERE IS_FILTERED = 'N'
         ORDER BY CREATED_AT DESC
@@ -86,10 +86,10 @@
             , CMT_CONTENT
             , C.CREATED_AT
             , C.IS_FILTERED
-        FROM POST p
-        LEFT JOIN POST_IMG i
+        FROM post p
+        LEFT JOIN post_img i
         ON p.POST_ID = i.POST_ID
-        LEFT JOIN CMT C
+        LEFT JOIN cmt C
         ON P.POST_ID = C.POST_ID
         WHERE p.POST_ID = #{postId}
         AND p.IS_FILTERED = 'N'
@@ -98,7 +98,7 @@
 
     <!-- 게시글 필터링 -->
     <update id="filterPost">
-        UPDATE POST
+        UPDATE post
         SET IS_FILTERED = 'Y'
         WHERE POST_ID = #{postId}
     </update>

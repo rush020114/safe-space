@@ -17,7 +17,7 @@
 
     <!-- 신고 등록 -->
     <insert id="regReport">
-        INSERT INTO REPORT (
+        INSERT INTO report (
             TARGET_TYPE
             , TARGET_ID
             , REPORT_REASON
@@ -33,7 +33,7 @@
     <!-- 신고 중복 확인 -->
     <select id="getDupReport" resultType="int">
         SELECT COUNT(*)
-        FROM REPORT
+        FROM report
         WHERE TARGET_TYPE = #{targetType}
         AND TARGET_ID = #{targetId}
         AND REPORTER_ID = #{reporterId}
@@ -60,15 +60,15 @@
             , c.CMT_CONTENT
             , c.MEM_ID
         </if>
-        FROM REPORT r
+        FROM report r
         <if test="targetType != null and targetType.equals('POST')">
-            INNER JOIN POST p
+            INNER JOIN post p
             ON r.TARGET_ID = p.POST_ID
-            LEFT JOIN POST_IMG PIMG
+            LEFT JOIN post_img PIMG
             ON P.POST_ID = PIMG.POST_ID
         </if>
         <if test="targetType != null and targetType.equals('COMMENT')">
-            INNER JOIN CMT c
+            INNER JOIN cmt c
             ON r.TARGET_ID = c.CMT_ID
         </if>
         WHERE r.TARGET_TYPE = #{targetType}
@@ -78,7 +78,7 @@
 
     <!-- 관리자 신고 처리 -->
     <update id="handleReport">
-        UPDATE REPORT
+        UPDATE report
         SET REPORT_STATUS = #{reportStatus}
         WHERE REPORT_ID = #{reportId}
         AND REPORT_STATUS = 'PENDING'
