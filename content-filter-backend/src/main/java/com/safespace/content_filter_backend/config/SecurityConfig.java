@@ -62,7 +62,8 @@ public class SecurityConfig {
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             // 인증 및 인가에 대한 접근 설정
             .authorizeHttpRequests(auth ->
-                    auth.requestMatchers(HttpMethod.POST ,"/posts").authenticated() // 인증 정보를 가지고 있는 사람만 접근 가능
+                    auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers(HttpMethod.POST ,"/posts").authenticated() // 인증 정보를 가지고 있는 사람만 접근 가능
                         .requestMatchers(HttpMethod.POST, "/comments").authenticated()
                         .requestMatchers(HttpMethod.POST, "/reports").authenticated()
                         .requestMatchers("/admin/reports/stream").permitAll() // EventSource는 header로 요청 불가이므로 경로만 열기
@@ -90,7 +91,7 @@ public class SecurityConfig {
     corsConfiguration.setAllowCredentials(true);
     // 환경변수에서 받은 Origins를 쉼표로 분리해서 모두 허용
     Arrays.stream(allowedOrigins.split(","))
-            .forEach(corsConfiguration::addAllowedOrigin);
+            .forEach(corsConfiguration::addAllowedOriginPattern);
     corsConfiguration.addAllowedHeader("*"); // 모든 헤더 정보 허용
     corsConfiguration.addAllowedMethod("*"); // get, post, delete, put 등의 요청 허용
 
