@@ -84,4 +84,3 @@ SELECT * FROM REPORT;
 
 -- 제재 전체 조회
 SELECT * FROM SANCTION;
-
