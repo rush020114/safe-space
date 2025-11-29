@@ -3,7 +3,6 @@ package com.safespace.content_filter_backend.domain.report.service;
 import com.safespace.content_filter_backend.domain.admin.service.SseEmitterService;
 import com.safespace.content_filter_backend.domain.comment.dto.CommentDTO;
 import com.safespace.content_filter_backend.domain.comment.mapper.CommentMapper;
-import com.safespace.content_filter_backend.domain.member.dto.MemberDTO;
 import com.safespace.content_filter_backend.domain.member.mapper.MemberMapper;
 import com.safespace.content_filter_backend.domain.post.dto.PostDTO;
 import com.safespace.content_filter_backend.domain.post.mapper.PostMapper;
@@ -11,10 +10,7 @@ import com.safespace.content_filter_backend.domain.report.dto.ReportDTO;
 import com.safespace.content_filter_backend.domain.report.mapper.ReportMapper;
 import com.safespace.content_filter_backend.domain.report.model.ReportStatus;
 import com.safespace.content_filter_backend.domain.report.model.ReportTargetType;
-import com.safespace.content_filter_backend.domain.sanction.dto.SanctionDTO;
-import com.safespace.content_filter_backend.domain.sanction.mapper.SanctionMapper;
 import com.safespace.content_filter_backend.domain.sanction.service.SanctionService;
-import com.safespace.content_filter_backend.infra.redis.RedisService;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,9 +30,7 @@ public class ReportService {
   private final MemberMapper memberMapper;
   private final PostMapper postMapper;
   private final CommentMapper commentMapper;
-  private final SanctionMapper sanctionMapper;
   private final SseEmitterService sseEmitterService;
-  private final RedisService redisService;
   private final SanctionService sanctionService;
 
   // 신고 등록

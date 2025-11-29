@@ -4,7 +4,7 @@ import com.safespace.content_filter_backend.domain.member.dto.MemberDTO;
 import com.safespace.content_filter_backend.domain.member.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-// import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +17,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class SanctionScheduler {
   private final MemberMapper memberMapper;
-  // private final RedisTemplate<String, Object> redisTemplate;
+  private final RedisTemplate<String, Object> redisTemplate;
 
   // 매분마다 만료된 정지 해제 DB 기준으로 조회 → Redis는 동기화만
   // cron에 있는 문자열은 매분 0초라는 뜻
@@ -46,9 +46,9 @@ public class SanctionScheduler {
 
         // Redis 동기화 (키가 있으면)
         String redisKey = "member:" + memId;
-        // Boolean hasKey = redisTemplate.hasKey(redisKey);
+        Boolean hasKey = redisTemplate.hasKey(redisKey);
 
-        /*if (hasKey != null && hasKey) {
+        if (hasKey != null && hasKey) {
           // Redis 캐시 있으면 업데이트
           Map<String, String> updates = Map.of(
                   "status", "ACTIVE",
@@ -58,7 +58,7 @@ public class SanctionScheduler {
           log.info("Redis 동기화 완료: memId={}", memId);
         } else {
           log.info("Redis 캐시 없음 (DB만 업데이트): memId={}", memId);
-        }*/
+        }
         releasedCnt++;
         log.info("정지 해제: memId={}, bannedUntil={}",
                 memId, member.getBannedUntil());

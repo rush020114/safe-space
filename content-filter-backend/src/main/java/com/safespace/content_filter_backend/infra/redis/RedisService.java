@@ -5,7 +5,7 @@ import com.safespace.content_filter_backend.domain.member.mapper.MemberMapper;
 import com.safespace.content_filter_backend.domain.sanction.dto.SanctionDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-// import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 public class RedisService {
   // Redis랑 통신할 때 쓰는 도구 (Spring에서 제공)
   // 설정 파일로 인해 Redis서버와 연결, key와 value가 문자열로 저장될 수 있게 됨.
-  // private final RedisTemplate<String, Object> redisTemplate;
+  private final RedisTemplate<String, Object> redisTemplate;
   private final MemberMapper memberMapper;
 
   private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
@@ -34,13 +34,13 @@ public class RedisService {
     String key = "member:" + memId;
 
     // redis에서 hash 전체 조회
-    // Map<Object, Object> cachedData = redisTemplate.opsForHash().entries(key);
+    Map<Object, Object> cachedData = redisTemplate.opsForHash().entries(key);
 
-    /*if(!cachedData.isEmpty()){
+    if(!cachedData.isEmpty()){
       // 캐시 히트 : 필요한 데이터를 DB나 원본 저장소까지 가지 않고, Redis 같은 캐시에서 바로 찾은 경우
       log.info("Redis 캐시 히트: memId={}", memId);
       return convertToMemberDTO(cachedData);
-    }*/
+    }
 
     // 캐시 미스 → DB 조회
     log.info("Redis 캐시 미스 → DB 조회: memId={}", memId);
@@ -77,8 +77,8 @@ public class RedisService {
     updates.put("sanctionType", sanctionType != null ? sanctionType : "");
     updates.put("sanctionReason", sanctionReason != null ? sanctionReason : "");
 
-    // redisTemplate.opsForHash().putAll(key, updates);
-    // redisTemplate.expire(key, 24, TimeUnit.HOURS);
+    redisTemplate.opsForHash().putAll(key, updates);
+    redisTemplate.expire(key, 24, TimeUnit.HOURS);
 
     log.info("Redis 제재 상태 업데이트: memId={}, status={}, type={}", memId, newStatus, sanctionType);
   }
@@ -98,8 +98,8 @@ public class RedisService {
     hashData.put("sanctionReason", sanction != null && sanction.getSanctionReason() != null ? sanction.getSanctionReason() : "");
 
     // HASH 전체를 한 번에 저장
-    // redisTemplate.opsForHash().putAll(key, hashData);
-    // redisTemplate.expire(key, 24, TimeUnit.HOURS);
+    redisTemplate.opsForHash().putAll(key, hashData);
+    redisTemplate.expire(key, 24, TimeUnit.HOURS);
 
     log.info("Redis 캐시 저장 완료: memId={}", memId);
   }

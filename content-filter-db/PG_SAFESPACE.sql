@@ -1,5 +1,5 @@
 -- 회원
-CREATE TABLE MEMBER(
+CREATE TABLE MEMBER(v
    MEM_ID SERIAL PRIMARY KEY                 -- 아이디
    , MEM_EMAIL VARCHAR(100) UNIQUE NOT NULL    -- 이메일
    , MEM_PW VARCHAR(255) NOT NULL              -- 비밀번호
