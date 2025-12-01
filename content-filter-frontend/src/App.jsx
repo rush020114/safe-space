@@ -24,7 +24,7 @@ const App = () => {
           <Route path='/login' element={<Login />} />
           <Route path='/join' element={<Join />} /> 
           <Route path='/post' element={<ProtectedRoute><Post /></ProtectedRoute>} /> 
-          <Route path='/post-detail/:postId' element={<PostDetail />} /> 
+          <Route path='/post-detail/:postId' element={<PostDetail />} />
           <Route path='/user' element={<ProtectedRoute><div>유저</div></ProtectedRoute>} /> 
         </Route>
         <Route path='/admin' element={<Layout />}>
