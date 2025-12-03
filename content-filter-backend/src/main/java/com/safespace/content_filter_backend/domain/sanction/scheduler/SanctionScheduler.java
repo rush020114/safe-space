@@ -54,7 +54,7 @@ public class SanctionScheduler {
                   "status", "ACTIVE",
                   "bannedUntil", ""
           );
-          // redisTemplate.opsForHash().putAll(redisKey, updates);
+          redisTemplate.opsForHash().putAll(redisKey, updates);
           log.info("Redis 동기화 완료: memId={}", memId);
         } else {
           log.info("Redis 캐시 없음 (DB만 업데이트): memId={}", memId);
