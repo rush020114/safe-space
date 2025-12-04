@@ -31,7 +31,7 @@ public class AdminReportController {
   private final SseEmitterService sseEmitterService;
   private final JwtUtil jwtUtil;
 
-  // produces 값이 없으면 클라이언트가 EventSource로 연결해도 SSE로 인식되지 않음
+  // produces 값이 없으면 클라이언트가 EventSource로 연결해도 SSE로 인식되지 않음.
   // 반드시 getMapping으로 요청을 보내야 함.
   /**
    * SSE 연결 엔드포인트
