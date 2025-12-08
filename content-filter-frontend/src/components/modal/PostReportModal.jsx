@@ -2,6 +2,8 @@ import React from 'react';
 import { Modal, Button, Image } from 'react-bootstrap';
 import dayjs from 'dayjs';
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
 const PostReportModal = ({ show, onHide, report, onProcess, onReject }) => {
   if (!report || !report.postDTO) return null;
 
@@ -26,7 +28,7 @@ const PostReportModal = ({ show, onHide, report, onProcess, onReject }) => {
             <hr />
             <p><strong>사진:</strong></p>
             <Image
-              src={`/post/${imageName}`}
+              src={`${API_URL}/post/${imageName}`}
               alt="신고된 게시글 이미지"
               fluid
               style={{ maxHeight: '300px', objectFit: 'contain', backgroundColor: '#e9ecef' }}

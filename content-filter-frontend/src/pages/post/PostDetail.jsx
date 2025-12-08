@@ -8,6 +8,9 @@ import { isAdmin, isAuthenticated } from '../../apis/authCheck';
 import { jwtDecode } from 'jwt-decode';
 import ReportModal from '../../components/modal/ReportModal';
 import useReport from '../../hooks/useReport';
+import { getPostDetailApi } from '../../apis/postApi';
+
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 const PostDetail = () => {
   const token = useSelector(state => state.auth.token);
@@ -28,9 +31,16 @@ const PostDetail = () => {
 
   // 게시글 상세를 조회할 useEffect
   useEffect(() => {
-    axiosInstance.get(`/posts/${postId}`)
-    .then(res => setPostDetail(res.data))
-    .catch(e => console.log(e));
+    const getPostDetail = async () => {
+      try{
+        const res = await getPostDetailApi(postId);
+  
+        setPostDetail(res.data);
+      } catch(e){
+        console.log(e);
+      }
+    }
+    getPostDetail();
   }, [reload]);
   
   // 댓글을 등록할 함수
@@ -70,7 +80,7 @@ const PostDetail = () => {
       {postDetail?.postImgDTO?.attachedImgName && (
         <Card.Img
           variant="top"
-          src={`/post/${postDetail.postImgDTO.attachedImgName}`}
+          src={`${API_URL}/post/${postDetail.postImgDTO.attachedImgName}`}
           alt="게시글 이미지"
           style={{
             objectFit: "contain",

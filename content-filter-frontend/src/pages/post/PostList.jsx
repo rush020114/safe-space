@@ -8,6 +8,7 @@ import { isAdmin, isAuthenticated } from '../../apis/authCheck';
 import { useNavigate } from 'react-router-dom';
 import ReportModal from '../../components/modal/ReportModal';
 import useReport from '../../hooks/useReport';
+import { getPostListApi } from '../../apis/postApi';
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
@@ -25,9 +26,15 @@ const PostList = () => {
 
   // 게시글 목록을 세팅할 useEffect
   useEffect(() => {
-    axiosInstance.get(`/posts`)
-    .then(res => setPostList(res.data))
-    .catch(e => console.log(e));
+    const getPostList = async () => {
+      try{
+        const res = await getPostListApi();
+        setPostList(res.data);
+      } catch(e){
+        console.log(e);
+      };
+    }
+    getPostList();
   }, []);
 
   console.log(postList);
